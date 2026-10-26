@@ -1,53 +1,29 @@
-<a id="top" name="top"></a>
+<p align="center">
+  <a href="README.zh.md"><kbd>中文</kbd></a>&nbsp;
+  <a href="README.ja.md"><kbd>日本語</kbd></a>&nbsp;
+  <a href="README.md"><kbd><b>English</b></kbd></a>
+</p>
 
-# Samnour Games · 山落游戏
+<h1 align="center">Samnour Games · 山落游戏</h1>
 
-<p>
-  <a href="#zh"><strong>中文</strong></a>
-  &nbsp;·&nbsp;
-  <a href="#ja"><strong>日本語</strong></a>
-  &nbsp;·&nbsp;
-  <a href="#en"><strong>English</strong></a>
+<p align="center">Free online games</p>
+
+<p align="center">
+  <a href="https://samnourgames.github.io/SamnourGames/"><b>samnourgames.github.io/SamnourGames/</b></a>
 </p>
 
 ---
-
-<a id="zh" name="zh"></a>
-
-## 中文
-
-这里是 **Samnour Games / 山落游戏**。
-
-**网址：** [https://samnourgames.github.io/SamnourGames/](https://samnourgames.github.io/SamnourGames/)
-
-希望你们喜欢我的游戏。
-
-[回到顶部 ↑](#top)
-
----
-
-<a id="ja" name="ja"></a>
-
-## 日本語
-
-ここは **Samnour Games / 山落游戏** です。
-
-**サイト：** [https://samnourgames.github.io/SamnourGames/](https://samnourgames.github.io/SamnourGames/)
-
-私のゲームを楽しんでいただけたら嬉しいです。
-
-[トップへ ↑](#top)
-
----
-
-<a id="en" name="en"></a>
-
-## English
 
 This is **Samnour Games / 山落游戏**.
 
 **Website:** [https://samnourgames.github.io/SamnourGames/](https://samnourgames.github.io/SamnourGames/)
 
+Currently featured:
+
+- [Three-Body Simulation](https://samnourgames.github.io/SamnourGames/games/three-body/) — a three-body motion simulation in the browser
+
 I hope you enjoy my games.
 
-[Back to top ↑](#top)
+---
+
+<p align="center"><sub>© Samnour Games · 山落游戏</sub></p>
