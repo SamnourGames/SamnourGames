@@ -161,6 +161,56 @@
       letter-spacing: 0;
     }
 
+    .language-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .language-bar > span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 650;
+      letter-spacing: .08em;
+    }
+
+    .lang-switch {
+      display: flex;
+      gap: 3px;
+      padding: 2px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: rgba(255, 255, 255, .03);
+    }
+
+    .lang-switch button {
+      min-height: 28px;
+      padding: 0 9px;
+      border: 0;
+      border-radius: 7px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 10px;
+      font-weight: 650;
+      letter-spacing: .02em;
+    }
+
+    .lang-switch button:hover {
+      color: var(--text);
+      border-color: transparent;
+      background: rgba(255, 255, 255, .08);
+    }
+
+    .lang-switch button.active,
+    .lang-switch button.active:hover {
+      color: #071019;
+      background: linear-gradient(135deg, #9ff0ff, #65d5f5);
+    }
+
     select {
       width: 100%;
       height: 40px;
@@ -423,85 +473,94 @@
 
   <header class="topbar">
     <div class="brand">
-      <div class="eyebrow"><i class="pulse"></i>REAL-TIME GRAVITY LAB</div>
-      <h1>引力剧场</h1>
+      <div class="eyebrow"><i class="pulse"></i><span data-i18n="eyebrow">REAL-TIME GRAVITY LAB</span></div>
+      <h1 data-i18n="title">引力剧场</h1>
       <div class="subtitle" id="modelDescription">三维牛顿万有引力 · Velocity Verlet 积分 · 实时守恒量监测</div>
     </div>
     <div class="time-card">
-      <span>延迟回放时间 · T</span>
+      <span data-i18n="delayTime">延迟回放时间 · T</span>
       <strong id="simTime">0.000</strong>
     </div>
   </header>
 
-  <aside class="panel" aria-label="模拟控制台">
+  <aside class="panel" aria-label="模拟控制台" data-i18n-aria="panelLabel">
+    <div class="language-bar">
+      <span data-i18n="language">语言</span>
+      <div class="lang-switch" role="group" aria-label="语言" data-i18n-aria="language">
+        <button type="button" data-set-lang="zh" class="active">中文</button>
+        <button type="button" data-set-lang="ja">日本語</button>
+        <button type="button" data-set-lang="en">EN</button>
+      </div>
+    </div>
+
     <section class="section">
-      <div class="label-row"><span>初始构型</span></div>
+      <div class="label-row"><span data-i18n="presetLabel">初始构型</span></div>
       <select id="preset">
-        <option value="figure8">八字舞 · 周期轨道</option>
-        <option value="chaos">混沌三角 · 高敏感</option>
-        <option value="binary">双星与访客 · 散射</option>
-        <option value="planetary">层级系统 · 双行星</option>
-        <option value="custom" disabled>自定义初始条件</option>
+        <option value="figure8" data-i18n="presetFigure8">八字舞 · 周期轨道</option>
+        <option value="chaos" data-i18n="presetChaos">混沌三角 · 高敏感</option>
+        <option value="binary" data-i18n="presetBinary">双星与访客 · 散射</option>
+        <option value="planetary" data-i18n="presetPlanetary">层级系统 · 双行星</option>
+        <option value="custom" disabled data-i18n="presetCustom">自定义初始条件</option>
       </select>
       <div class="button-row">
         <button class="primary" id="toggle">暂停</button>
-        <button id="reset">重置</button>
-        <button id="random">随机</button>
+        <button id="reset" data-i18n="reset">重置</button>
+        <button id="random" data-i18n="random">随机</button>
       </div>
     </section>
 
     <section class="section">
-      <div class="label-row"><span>时间加速</span><output id="computeRate">60 次/s</output></div>
-      <select id="timeScale" aria-label="时间加速倍率">
+      <div class="label-row"><span data-i18n="timeAccel">时间加速</span><output id="computeRate">60 次/s</output></div>
+      <select id="timeScale" aria-label="时间加速倍率" data-i18n-aria="timeScaleAria">
         <option value="0.5">0.5× · 30 次/s</option>
         <option value="1" selected>1× · 60 次/s</option>
         <option value="2">2× · 120 次/s</option>
         <option value="4">4× · 240 次/s</option>
         <option value="8">8× · 480 次/s</option>
       </select>
-      <div class="stat"><span>计算领先于画面</span><strong id="bufferLead">3.000 s</strong></div>
+      <div class="stat"><span data-i18n="bufferLead">计算领先于画面</span><strong id="bufferLead">3.000 s</strong></div>
     </section>
 
     <section class="section">
       <div class="switches">
-        <label class="switch"><input id="trails" type="checkbox" checked>轨迹尾迹</label>
-        <label class="switch"><input id="vectors" type="checkbox">速度矢量</label>
-        <label class="switch"><input id="tracking" type="checkbox" checked>跟随质心</label>
-        <label class="switch"><input id="view3d" type="checkbox">3D 透视 · V</label>
-        <label class="switch"><input id="autoOrbit" type="checkbox">自动环绕</label>
+        <label class="switch"><input id="trails" type="checkbox" checked><span data-i18n="trails">轨迹尾迹</span></label>
+        <label class="switch"><input id="vectors" type="checkbox"><span data-i18n="vectors">速度矢量</span></label>
+        <label class="switch"><input id="tracking" type="checkbox" checked><span data-i18n="tracking">跟随质心</span></label>
+        <label class="switch"><input id="view3d" type="checkbox"><span data-i18n="view3d">3D 透视 · V</span></label>
+        <label class="switch"><input id="autoOrbit" type="checkbox"><span data-i18n="autoOrbit">自动环绕</span></label>
       </div>
     </section>
 
     <section class="section">
-      <div class="label-row"><span>自定义初始条件</span><output>M / r / v</output></div>
-      <p class="condition-note">输入质量、三维位置、速率和方向。采用一致单位制；不会自动修正你输入的速度。</p>
+      <div class="label-row"><span data-i18n="customInitial">自定义初始条件</span><output>M / r / v</output></div>
+      <p class="condition-note" data-i18n="customNote">输入质量、三维位置、速率和方向。采用一致单位制；不会自动修正你输入的速度。</p>
       <div class="unit-grid">
-        <label class="number-field"><span>引力常数 G</span><input id="gravityConstant" type="number" min="0" step="any" value="1"></label>
-        <label class="number-field"><span>内部最大步长 Δt</span><input id="timeStep" type="number" min="0.0000001" step="any" value="0.0016666666666667"></label>
+        <label class="number-field"><span data-i18n="gConstant">引力常数 G</span><input id="gravityConstant" type="number" min="0" step="any" value="1"></label>
+        <label class="number-field"><span data-i18n="maxStep">内部最大步长 Δt</span><input id="timeStep" type="number" min="0.0000001" step="any" value="0.0016666666666667"></label>
       </div>
       <div id="conditionRows"></div>
-      <button class="primary apply-conditions" id="applyConditions">严格按输入初值从 T = 0 开始</button>
-      <p class="condition-note" style="margin-top:8px">方位角 θ：0° 指向 +X，90° 指向 +Y。仰角 φ：0° 位于 XY 平面，90° 指向 +Z。SI 制可填写 G = 6.67430e−11。</p>
+      <button class="primary apply-conditions" id="applyConditions" data-i18n="applyStrict">严格按输入初值从 T = 0 开始</button>
+      <p class="condition-note" style="margin-top:8px" data-i18n="angleNote">方位角 θ：0° 指向 +X，90° 指向 +Y。仰角 φ：0° 位于 XY 平面，90° 指向 +Z。SI 制可填写 G = 6.67430e−11。</p>
     </section>
 
     <section class="section">
-      <div class="label-row"><span>系统状态</span><output id="bodyCount">3 个天体</output></div>
+      <div class="label-row"><span data-i18n="systemStatus">系统状态</span><output id="bodyCount">3 个天体</output></div>
       <div class="stats">
-        <div class="stat"><span>总能量 E</span><strong id="energy">—</strong></div>
-        <div class="stat"><span>相对漂移 ΔE</span><strong id="drift">—</strong></div>
-        <div class="stat"><span>角动量基准 |L₀|</span><strong id="angular">—</strong></div>
-        <div class="stat"><span>角动量误差 ΔL</span><strong id="angularDrift">—</strong></div>
-        <div class="stat"><span>质心速度</span><strong id="comSpeed">—</strong></div>
+        <div class="stat"><span data-i18n="totalEnergy">总能量 E</span><strong id="energy">—</strong></div>
+        <div class="stat"><span data-i18n="drift">相对漂移 ΔE</span><strong id="drift">—</strong></div>
+        <div class="stat"><span data-i18n="angularBase">角动量基准 |L₀|</span><strong id="angular">—</strong></div>
+        <div class="stat"><span data-i18n="angularError">角动量误差 ΔL</span><strong id="angularDrift">—</strong></div>
+        <div class="stat"><span data-i18n="comSpeed">质心速度</span><strong id="comSpeed">—</strong></div>
       </div>
     </section>
   </aside>
 
   <div class="legend">
-    <span class="hint">拖动 · 平移视角</span>
-    <span class="hint">滚轮 · 缩放</span>
-    <span class="hint">Space · 暂停</span>
-    <span class="hint">R · 重置</span>
-    <span class="hint">V · 3D 视角</span>
+    <span class="hint" data-i18n="legendDrag">拖动 · 平移视角</span>
+    <span class="hint" data-i18n="legendWheel">滚轮 · 缩放</span>
+    <span class="hint" data-i18n="legendSpace">Space · 暂停</span>
+    <span class="hint" data-i18n="legendReset">R · 重置</span>
+    <span class="hint" data-i18n="legend3d">V · 3D 视角</span>
   </div>
   <div class="toast" id="toast"></div>
 
@@ -536,6 +595,240 @@
       const ENCOUNTER_SAFETY = 0.025;
       const MAX_TRAIL_POINTS = 900;
       const COLORS = ['#71e5ff', '#ff7fa8', '#b79aff'];
+      const I18N = {
+        zh: {
+          pageTitle: '引力剧场 · 三体模拟',
+          canvasLabel: '三体引力模拟画布',
+          language: '语言',
+          eyebrow: '实时引力实验室',
+          title: '引力剧场',
+          delayTime: '延迟回放时间 · T',
+          panelLabel: '模拟控制台',
+          presetLabel: '初始构型',
+          presetFigure8: '八字舞 · 周期轨道',
+          presetChaos: '混沌三角 · 高敏感',
+          presetBinary: '双星与访客 · 散射',
+          presetPlanetary: '层级系统 · 双行星',
+          presetCustom: '自定义初始条件',
+          pause: '暂停',
+          resume: '继续',
+          reset: '重置',
+          random: '随机',
+          timeAccel: '时间加速',
+          timeScaleAria: '时间加速倍率',
+          rate: '{n} 次/s',
+          bufferLead: '计算领先于画面',
+          trails: '轨迹尾迹',
+          vectors: '速度矢量',
+          tracking: '跟随质心',
+          view3d: '3D 透视 · V',
+          autoOrbit: '自动环绕',
+          customInitial: '自定义初始条件',
+          customNote: '输入质量、三维位置、速率和方向。采用一致单位制；不会自动修正你输入的速度。',
+          gConstant: '引力常数 G',
+          maxStep: '内部最大步长 Δt',
+          applyStrict: '严格按输入初值从 T = 0 开始',
+          angleNote: '方位角 θ：0° 指向 +X，90° 指向 +Y。仰角 φ：0° 位于 XY 平面，90° 指向 +Z。SI 制可填写 G = 6.67430e−11。',
+          systemStatus: '系统状态',
+          bodyCount: '{n} 个天体',
+          totalEnergy: '总能量 E',
+          drift: '相对漂移 ΔE',
+          angularBase: '角动量基准 |L₀|',
+          angularError: '角动量误差 ΔL',
+          comSpeed: '质心速度',
+          legendDrag: '拖动 · 平移视角',
+          legendWheel: '滚轮 · 缩放',
+          legendSpace: 'Space · 暂停',
+          legendReset: 'R · 重置',
+          legend3d: 'V · 3D 视角',
+          bodyTitle: '天体 M{n}',
+          mass: '质量 M',
+          posX: '位置 X',
+          posY: '位置 Y',
+          posZ: '深度 Z',
+          speed: '速率 |v|',
+          azimuth: '方位角 θ°',
+          elevation: '仰角 φ°',
+          bodyAria: '天体 {n} {label}',
+          model2d: '三维牛顿引力 · XY 正交投影 · 三轴守恒量监测',
+          model3d: '三维牛顿引力 · 透视轨道相机 · 三轴守恒量监测',
+          presetNameFigure8: '八字舞',
+          presetNameChaos: '混沌三角',
+          presetNameBinary: '双星与访客',
+          presetNamePlanetary: '层级系统',
+          toastNearLimit: '近距离引力使所需步长低于数值极限，模拟已暂停',
+          toastSubsteps: '单个 60 Hz 节拍需要过多子步，模拟已暂停',
+          toastBuffered: '已预算 3 秒；正以 {n} 次/s 延迟回放',
+          toastPreset: '「{name}」已预算 3 秒并以 {scale}× 回放',
+          toastReset: '已重新预算 3 秒并从 T = 0 以 {scale}× 回放',
+          toastRandom: '随机系统已预算 3 秒并以 {scale}× 回放',
+          toastSingularity: '点质量位置重合：牛顿引力在此处为奇点，模拟已暂停',
+          toastInvalidG: '参数无效：G 与固定步长必须是大于 0 的有限数值',
+          toastInvalidBody: '参数无效：质量须大于 0、速率须非负、仰角须在 −90° 至 90°',
+          toastCoincident: '参数无效：两个点质量不能处在完全相同的位置',
+          toastRate: '{scale}×：每个现实秒计算并呈现 {n} 个固定物理节拍',
+          toast3d: '3D 视角：拖动环绕，Shift + 拖动平移，滚轮缩放',
+          toast2d: '已返回 XY 平面正交视图'
+        },
+        ja: {
+          pageTitle: '重力劇場 · 三体シミュレーション',
+          canvasLabel: '三体重力シミュレーションのキャンバス',
+          language: '言語',
+          eyebrow: 'リアルタイム重力ラボ',
+          title: '重力劇場',
+          delayTime: '遅延再生時間 · T',
+          panelLabel: 'シミュレーション操作パネル',
+          presetLabel: '初期配置',
+          presetFigure8: '8の字ダンス · 周期軌道',
+          presetChaos: 'カオス三角 · 高感度',
+          presetBinary: '連星と訪問者 · 散乱',
+          presetPlanetary: '階層系 · 二重惑星',
+          presetCustom: 'カスタム初期条件',
+          pause: '一時停止',
+          resume: '再開',
+          reset: 'リセット',
+          random: 'ランダム',
+          timeAccel: '時間加速',
+          timeScaleAria: '時間加速倍率',
+          rate: '{n} 回/秒',
+          bufferLead: '計算が画面より先行',
+          trails: '軌道トレイル',
+          vectors: '速度ベクトル',
+          tracking: '重心を追従',
+          view3d: '3D パース · V',
+          autoOrbit: '自動周回',
+          customInitial: 'カスタム初期条件',
+          customNote: '質量、3次元位置、速度、方向を入力します。一貫した単位系を使用し、入力した速度は自動補正されません。',
+          gConstant: '重力定数 G',
+          maxStep: '内部最大ステップ Δt',
+          applyStrict: '入力した初期値で T = 0 から開始',
+          angleNote: '方位角 θ：0° は +X、90° は +Y。仰角 φ：0° は XY 平面、90° は +Z。SI 単位系では G = 6.67430e−11 を入力できます。',
+          systemStatus: 'システム状態',
+          bodyCount: '{n} 天体',
+          totalEnergy: '全エネルギー E',
+          drift: '相対ドリフト ΔE',
+          angularBase: '角運動量基準 |L₀|',
+          angularError: '角運動量誤差 ΔL',
+          comSpeed: '重心速度',
+          legendDrag: 'ドラッグ · 視点移動',
+          legendWheel: 'ホイール · ズーム',
+          legendSpace: 'Space · 一時停止',
+          legendReset: 'R · リセット',
+          legend3d: 'V · 3D 視点',
+          bodyTitle: '天体 M{n}',
+          mass: '質量 M',
+          posX: '位置 X',
+          posY: '位置 Y',
+          posZ: '深さ Z',
+          speed: '速度 |v|',
+          azimuth: '方位角 θ°',
+          elevation: '仰角 φ°',
+          bodyAria: '天体 {n} {label}',
+          model2d: '3次元ニュートン重力 · XY 正投影 · 三軸保存量モニター',
+          model3d: '3次元ニュートン重力 · 透視軌道カメラ · 三軸保存量モニター',
+          presetNameFigure8: '8の字ダンス',
+          presetNameChaos: 'カオス三角',
+          presetNameBinary: '連星と訪問者',
+          presetNamePlanetary: '階層系',
+          toastNearLimit: '近接重力により必要ステップが数値限界を下回ったため、シミュレーションを一時停止しました。',
+          toastSubsteps: '1つの 60 Hz ティックに必要なサブステップが多すぎるため、シミュレーションを一時停止しました。',
+          toastBuffered: '3秒分をバッファ済み。{n} 回/秒で遅延再生中です。',
+          toastPreset: '「{name}」を3秒分バッファし、{scale}×で再生中です。',
+          toastReset: 'T = 0 から3秒分を再バッファし、{scale}×で再生中です。',
+          toastRandom: 'ランダム系を3秒分バッファし、{scale}×で再生中です。',
+          toastSingularity: '質点が同一位置に重なりました。ニュートン重力が特異点となるため、一時停止しました。',
+          toastInvalidG: '無効なパラメータ：G と固定ステップは 0 より大きい有限値である必要があります。',
+          toastInvalidBody: '無効なパラメータ：質量は 0 より大きく、速度は 0 以上、仰角は −90° から 90° の範囲で入力してください。',
+          toastCoincident: '無効なパラメータ：2つの質点を同じ位置に置くことはできません。',
+          toastRate: '{scale}×：現実の1秒ごとに {n} 個の固定物理ステップを計算・表示します。',
+          toast3d: '3D 視点：ドラッグで周回、Shift + ドラッグで移動、ホイールでズーム。',
+          toast2d: 'XY 平面の正投影ビューに戻りました。'
+        },
+        en: {
+          pageTitle: 'Gravity Theatre · Three-Body Simulation',
+          canvasLabel: 'Three-body gravity simulation canvas',
+          language: 'Language',
+          eyebrow: 'REAL-TIME GRAVITY LAB',
+          title: 'Gravity Theatre',
+          delayTime: 'Delayed replay time · T',
+          panelLabel: 'Simulation controls',
+          presetLabel: 'Initial configuration',
+          presetFigure8: 'Figure-eight · Periodic orbit',
+          presetChaos: 'Chaotic triangle · Sensitive',
+          presetBinary: 'Binary & visitor · Scattering',
+          presetPlanetary: 'Hierarchical system · Two planets',
+          presetCustom: 'Custom initial conditions',
+          pause: 'Pause',
+          resume: 'Resume',
+          reset: 'Reset',
+          random: 'Random',
+          timeAccel: 'Time acceleration',
+          timeScaleAria: 'Time acceleration rate',
+          rate: '{n} steps/s',
+          bufferLead: 'Compute ahead of view',
+          trails: 'Orbit trails',
+          vectors: 'Velocity vectors',
+          tracking: 'Follow center of mass',
+          view3d: '3D perspective · V',
+          autoOrbit: 'Auto orbit',
+          customInitial: 'Custom initial conditions',
+          customNote: 'Enter mass, 3D position, speed, and direction. Use a consistent unit system; your velocities are not auto-corrected.',
+          gConstant: 'Gravitational constant G',
+          maxStep: 'Max internal step Δt',
+          applyStrict: 'Start from T = 0 with exact inputs',
+          angleNote: 'Azimuth θ: 0° points to +X, 90° to +Y. Elevation φ: 0° lies in the XY plane, 90° points to +Z. For SI units, enter G = 6.67430e−11.',
+          systemStatus: 'System status',
+          bodyCount: '{n} bodies',
+          totalEnergy: 'Total energy E',
+          drift: 'Relative drift ΔE',
+          angularBase: 'Angular momentum |L₀|',
+          angularError: 'Angular momentum error ΔL',
+          comSpeed: 'Center-of-mass speed',
+          legendDrag: 'Drag · Pan view',
+          legendWheel: 'Wheel · Zoom',
+          legendSpace: 'Space · Pause',
+          legendReset: 'R · Reset',
+          legend3d: 'V · 3D view',
+          bodyTitle: 'Body M{n}',
+          mass: 'Mass M',
+          posX: 'Position X',
+          posY: 'Position Y',
+          posZ: 'Depth Z',
+          speed: 'Speed |v|',
+          azimuth: 'Azimuth θ°',
+          elevation: 'Elevation φ°',
+          bodyAria: 'Body {n} {label}',
+          model2d: '3D Newtonian gravity · XY orthographic projection · three-axis conservation monitor',
+          model3d: '3D Newtonian gravity · perspective orbital camera · three-axis conservation monitor',
+          presetNameFigure8: 'Figure-eight',
+          presetNameChaos: 'Chaotic triangle',
+          presetNameBinary: 'Binary & visitor',
+          presetNamePlanetary: 'Hierarchical system',
+          toastNearLimit: 'Close-range gravity requires a step below the numerical limit. Simulation paused.',
+          toastSubsteps: 'A single 60 Hz tick requires too many substeps. Simulation paused.',
+          toastBuffered: 'Buffered 3 s; replaying at {n} steps/s.',
+          toastPreset: '"{name}" buffered for 3 s and replaying at {scale}×.',
+          toastReset: 'Rebuffered 3 s from T = 0 and replaying at {scale}×.',
+          toastRandom: 'Random system buffered for 3 s and replaying at {scale}×.',
+          toastSingularity: 'Point masses coincide. Newtonian gravity is singular here. Simulation paused.',
+          toastInvalidG: 'Invalid parameters: G and the fixed step must be finite values greater than 0.',
+          toastInvalidBody: 'Invalid parameters: mass must be > 0, speed must be non-negative, and elevation must be between −90° and 90°.',
+          toastCoincident: 'Invalid parameters: two point masses cannot occupy the same position.',
+          toastRate: '{scale}×: computing and displaying {n} fixed physics steps per real second.',
+          toast3d: '3D view: drag to orbit, Shift + drag to pan, wheel to zoom.',
+          toast2d: 'Returned to the XY orthographic view.'
+        }
+      };
+      const LANGS = ['zh', 'ja', 'en'];
+      let storedLang = null;
+      try { storedLang = localStorage.getItem('samnour-three-body-lang'); } catch (error) { storedLang = null; }
+      const requestedLang = new URLSearchParams(location.search).get('lang') || storedLang;
+      let language = LANGS.includes(requestedLang) ? requestedLang : 'zh';
+
+      function tr(key, vars = {}) {
+        const template = (I18N[language] && I18N[language][key]) ?? I18N.zh[key] ?? key;
+        return template.replace(/\{(\w+)\}/g, (_, name) => vars[name] ?? '');
+      }
       const state = {
         bodies: [],
         renderBodies: [],
@@ -567,7 +860,7 @@
 
       const PRESETS = {
         figure8: {
-          name: '八字舞', scale: 0.36,
+          name: '八字舞', nameKey: 'presetNameFigure8', scale: 0.36,
           bodies: [
             [1, -0.97000436,  0.24308753, 0,  0.466203685,  0.43236573, 0],
             [1,  0.97000436, -0.24308753, 0,  0.466203685,  0.43236573, 0],
@@ -575,7 +868,7 @@
           ]
         },
         chaos: {
-          name: '混沌三角', scale: 0.32,
+          name: '混沌三角', nameKey: 'presetNameChaos', scale: 0.32,
           bodies: [
             [1.18, -0.92, -0.18, -0.26,  0.24,  0.48,  0.13],
             [0.92,  0.79, -0.42,  0.18, -0.46,  0.28, -0.09],
@@ -583,7 +876,7 @@
           ]
         },
         binary: {
-          name: '双星与访客', scale: 0.23,
+          name: '双星与访客', nameKey: 'presetNameBinary', scale: 0.23,
           bodies: [
             [2.6, -0.52, 0, 0, 0, -0.94, -0.28],
             [2.6,  0.52, 0, 0, 0,  0.94,  0.28],
@@ -591,7 +884,7 @@
           ]
         },
         planetary: {
-          name: '层级系统', scale: 0.2,
+          name: '层级系统', nameKey: 'presetNamePlanetary', scale: 0.2,
           bodies: [
             [14, 0, 0, 0, 0, 0, 0],
             [0.42, 1.35, 0, 0.18, 0, 3.15, 0.42],
@@ -599,6 +892,44 @@
           ]
         }
       };
+
+      function updateTimeScaleOptions() {
+        [...ui.timeScale.options].forEach((option) => {
+          const operations = REALTIME_HZ * Number(option.value);
+          option.textContent = `${option.value}× · ${tr('rate', { n: operations })}`;
+        });
+      }
+
+      function updateToggleLabel() {
+        ui.toggle.textContent = tr(state.running ? 'pause' : 'resume');
+      }
+
+      function setLanguage(next, persist = true) {
+        language = LANGS.includes(next) ? next : 'zh';
+        if (persist) {
+          try { localStorage.setItem('samnour-three-body-lang', language); } catch (error) { /* ignore */ }
+        }
+        document.documentElement.lang = language === 'zh' ? 'zh-CN' : language;
+        document.title = tr('pageTitle');
+        canvas.setAttribute('aria-label', tr('canvasLabel'));
+        document.querySelectorAll('[data-i18n]').forEach((element) => {
+          element.textContent = tr(element.dataset.i18n);
+        });
+        document.querySelectorAll('[data-i18n-aria]').forEach((element) => {
+          element.setAttribute('aria-label', tr(element.dataset.i18nAria));
+        });
+        document.querySelectorAll('[data-set-lang]').forEach((button) => {
+          const active = button.dataset.setLang === language;
+          button.classList.toggle('active', active);
+          button.setAttribute('aria-pressed', String(active));
+        });
+        updateTimeScaleOptions();
+        updateTimeScale(false);
+        updateToggleLabel();
+        set3DView(state.view3D, false);
+        populateInitialEditor(true);
+        updateStats(true);
+      }
 
       function makeBody([mass, x, y, z, vx, vy, vz], index) {
         return {
@@ -647,8 +978,8 @@
           const adaptiveStep = adaptiveStepLimit();
           if (!Number.isFinite(adaptiveStep) || adaptiveStep < state.fixedStep * MIN_STEP_RATIO) {
             state.running = false;
-            ui.toggle.textContent = '继续';
-            showToast('近距离引力使所需步长低于数值极限，模拟已暂停');
+            updateToggleLabel();
+            showToast(tr('toastNearLimit'));
             return false;
           }
           const step = Math.min(state.fixedStep, adaptiveStep, remaining);
@@ -657,8 +988,8 @@
           internalSteps++;
           if (!state.running || internalSteps > 50000) {
             state.running = false;
-            ui.toggle.textContent = '继续';
-            if (internalSteps > 50000) showToast('单个 60 Hz 节拍需要过多子步，模拟已暂停');
+            updateToggleLabel();
+            if (internalSteps > 50000) showToast(tr('toastSubsteps'));
             return false;
           }
         }
@@ -672,7 +1003,7 @@
         state.playbackTime = 0;
         state.realtimeAccumulator = 0;
         state.running = true;
-        ui.toggle.textContent = '暂停';
+        updateToggleLabel();
         showReplaySnapshot(capturePhysicsSnapshot());
         for (let sample = 0; sample < PRECOMPUTE_SAMPLES; sample++) {
           if (!advancePhysicsBy(FRAME_INTERVAL)) break;
@@ -704,7 +1035,12 @@
         return Number(value.toPrecision(9)).toString();
       }
 
-      function populateInitialEditor() {
+      function populateInitialEditor(preserveValues = false) {
+        const previousValues = preserveValues
+          ? [...ui.conditionRows.querySelectorAll('.body-editor')].map((row) => Object.fromEntries(
+              [...row.querySelectorAll('[data-field]')].map((input) => [input.dataset.field, input.value])
+            ))
+          : null;
         ui.gravityConstant.value = state.gravityConstant;
         ui.timeStep.value = state.fixedStep;
         ui.conditionRows.innerHTML = state.bodies.map((b, index) => {
@@ -713,23 +1049,32 @@
           const elevation = speed === 0 ? 0 : Math.asin(Math.max(-1, Math.min(1, b.vz / speed))) * 180 / Math.PI;
           const field = (label, name, value, attributes = '') => `
             <label class="number-field"><span>${label}</span>
-              <input type="number" step="any" data-field="${name}" value="${formatConditionValue(value)}" ${attributes} aria-label="天体 ${index + 1} ${label}">
+              <input type="number" step="any" data-field="${name}" value="${formatConditionValue(value)}" ${attributes} aria-label="${tr('bodyAria', { n: index + 1, label })}">
             </label>`;
           return `
           <div class="body-editor" data-index="${index}">
-            <div class="body-editor-title"><i class="body-mark" style="--body-color:${b.color}"></i>天体 M${index + 1}</div>
+            <div class="body-editor-title"><i class="body-mark" style="--body-color:${b.color}"></i>${tr('bodyTitle', { n: index + 1 })}</div>
             <div class="field-grid">
-              ${field('质量 M', 'mass', b.mass, 'min="0"')}
-              ${field('位置 X', 'x', b.x)}
-              ${field('位置 Y', 'y', b.y)}
-              ${field('深度 Z', 'z', b.z)}
-              ${field('速率 |v|', 'speed', speed, 'min="0"')}
-              ${field('方位角 θ°', 'azimuth', azimuth)}
-              ${field('仰角 φ°', 'elevation', elevation, 'min="-90" max="90"')}
+              ${field(tr('mass'), 'mass', b.mass, 'min="0"')}
+              ${field(tr('posX'), 'x', b.x)}
+              ${field(tr('posY'), 'y', b.y)}
+              ${field(tr('posZ'), 'z', b.z)}
+              ${field(tr('speed'), 'speed', speed, 'min="0"')}
+              ${field(tr('azimuth'), 'azimuth', azimuth)}
+              ${field(tr('elevation'), 'elevation', elevation, 'min="-90" max="90"')}
             </div>
           </div>
         `;
         }).join('');
+        if (previousValues) {
+          [...ui.conditionRows.querySelectorAll('.body-editor')].forEach((row, index) => {
+            const values = previousValues[index];
+            if (!values) return;
+            row.querySelectorAll('[data-field]').forEach((input) => {
+              if (values[input.dataset.field] !== undefined) input.value = values[input.dataset.field];
+            });
+          });
+        }
       }
 
       function applyInitialConditions() {
@@ -744,14 +1089,14 @@
         const gravityConstant = Number(ui.gravityConstant.value);
         const fixedStep = Number(ui.timeStep.value);
         if (!Number.isFinite(gravityConstant) || gravityConstant <= 0 || !Number.isFinite(fixedStep) || fixedStep <= 0) {
-          showToast('参数无效：G 与固定步长必须是大于 0 的有限数值');
+          showToast(tr('toastInvalidG'));
           return;
         }
         if (values.some((v) =>
           ![v.mass, v.x, v.y, v.z, v.speed, v.azimuth, v.elevation].every(Number.isFinite) ||
           v.mass <= 0 || v.speed < 0 || Math.abs(v.elevation) > 90
         )) {
-          showToast('参数无效：质量须大于 0、速率须非负、仰角须在 −90° 至 90°');
+          showToast(tr('toastInvalidBody'));
           return;
         }
         for (let i = 0; i < values.length; i++) {
@@ -761,7 +1106,7 @@
               values[j].y - values[i].y,
               values[j].z - values[i].z
             ) === 0) {
-              showToast('参数无效：两个点质量不能处在完全相同的位置');
+              showToast(tr('toastCoincident'));
               return;
             }
           }
@@ -788,7 +1133,7 @@
         populateInitialEditor();
         const buffered = initializeReplayBuffer();
         updateStats(true);
-        if (buffered) showToast(`已预算 3 秒；正以 ${REALTIME_HZ * state.timeScale} 次/s 延迟回放`);
+        if (buffered) showToast(tr('toastBuffered', { n: REALTIME_HZ * state.timeScale }));
       }
 
       function loadPreset(key, announce = true) {
@@ -806,7 +1151,7 @@
         populateInitialEditor();
         const buffered = initializeReplayBuffer();
         updateStats(true);
-        if (announce && buffered) showToast(`「${preset.name}」已预算 3 秒并以 ${state.timeScale}× 回放`);
+        if (announce && buffered) showToast(tr('toastPreset', { name: tr(preset.nameKey), scale: state.timeScale }));
       }
 
       function resetSimulation() {
@@ -819,7 +1164,7 @@
         populateInitialEditor();
         const buffered = initializeReplayBuffer();
         updateStats(true);
-        if (buffered) showToast(`已重新预算 3 秒并从 T = 0 以 ${state.timeScale}× 回放`);
+        if (buffered) showToast(tr('toastReset', { scale: state.timeScale }));
       }
 
       function randomSystem() {
@@ -853,7 +1198,7 @@
         populateInitialEditor();
         const buffered = initializeReplayBuffer();
         updateStats(true);
-        if (buffered) showToast(`随机系统已预算 3 秒并以 ${state.timeScale}× 回放`);
+        if (buffered) showToast(tr('toastRandom', { scale: state.timeScale }));
       }
 
       function computeAccelerations() {
@@ -868,10 +1213,10 @@
             const r2 = dx * dx + dy * dy + dz * dz;
             if (r2 === 0) {
               state.running = false;
-              ui.toggle.textContent = '继续';
+              updateToggleLabel();
               if (!state.singularityReported) {
                 state.singularityReported = true;
-                showToast('点质量位置重合：牛顿引力在此处为奇点，模拟已暂停');
+                showToast(tr('toastSingularity'));
               }
               continue;
             }
@@ -996,7 +1341,7 @@
           : `${(relativeAngularError * 100).toExponential(2)}%`;
         ui.angularDrift.style.color = (relativeAngularError ?? angularError) > 1e-5 ? '#ffcf91' : '#aeb8cf';
         ui.comSpeed.textContent = compactNumber(Math.hypot(d.com.vx, d.com.vy, d.com.vz));
-        ui.bodyCount.textContent = `${shownBodies.length} 个天体`;
+        ui.bodyCount.textContent = tr('bodyCount', { n: shownBodies.length });
         ui.bufferLead.textContent = `${Math.max(0, state.time - state.playbackTime).toFixed(3)} s`;
       }
 
@@ -1385,7 +1730,7 @@
 
       function toggleRunning() {
         state.running = !state.running;
-        ui.toggle.textContent = state.running ? '暂停' : '继续';
+        updateToggleLabel();
         ui.toggle.setAttribute('aria-pressed', String(!state.running));
       }
 
@@ -1393,9 +1738,10 @@
         const requested = Number(ui.timeScale.value);
         state.timeScale = [0.5, 1, 2, 4, 8].includes(requested) ? requested : 1;
         const operationsPerSecond = REALTIME_HZ * state.timeScale;
-        ui.computeRate.textContent = `${operationsPerSecond} 次/s`;
+        updateTimeScaleOptions();
+        ui.computeRate.textContent = tr('rate', { n: operationsPerSecond });
         if (announce) {
-          showToast(`${state.timeScale}×：每个现实秒计算并呈现 ${operationsPerSecond} 个固定物理节拍`);
+          showToast(tr('toastRate', { scale: state.timeScale, n: operationsPerSecond }));
         }
       }
 
@@ -1403,13 +1749,9 @@
         state.view3D = Boolean(enabled);
         ui.view3d.checked = state.view3D;
         ui.autoOrbit.disabled = !state.view3D;
-        ui.modelDescription.textContent = state.view3D
-          ? '三维牛顿引力 · 透视轨道相机 · 三轴守恒量监测'
-          : '三维牛顿引力 · XY 正交投影 · 三轴守恒量监测';
+        ui.modelDescription.textContent = tr(state.view3D ? 'model3d' : 'model2d');
         if (announce) {
-          showToast(state.view3D
-            ? '3D 视角：拖动环绕，Shift + 拖动平移，滚轮缩放'
-            : '已返回 XY 平面正交视图');
+          showToast(tr(state.view3D ? 'toast3d' : 'toast2d'));
         }
       }
 
@@ -1427,6 +1769,9 @@
       ui.applyConditions.addEventListener('click', applyInitialConditions);
       ui.timeScale.addEventListener('change', () => updateTimeScale());
       ui.view3d.addEventListener('change', () => set3DView(ui.view3d.checked));
+      document.querySelectorAll('[data-set-lang]').forEach((button) => {
+        button.addEventListener('click', () => setLanguage(button.dataset.setLang));
+      });
       ui.trails.addEventListener('change', () => {
         if (!ui.trails.checked) {
           state.playbackTrails = visibleBodies().map(() => []);
@@ -1503,6 +1848,7 @@
       updateTimeScale(false);
       set3DView(false, false);
       loadPreset('figure8', false);
+      setLanguage(language, false);
       requestAnimationFrame(frame);
     })();
   </script>
