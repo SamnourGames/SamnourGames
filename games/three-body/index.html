@@ -1,0 +1,1510 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#05070d">
+  <title>引力剧场 · 三体模拟</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #05070d;
+      --panel: rgba(12, 16, 28, 0.78);
+      --panel-strong: rgba(16, 21, 36, 0.94);
+      --line: rgba(255, 255, 255, 0.09);
+      --text: #f4f7ff;
+      --muted: #8f99b3;
+      --cyan: #6fe7ff;
+      --violet: #a28bff;
+      --danger: #ff7b9d;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    button, select, input { font: inherit; }
+
+    #space {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    #space.dragging { cursor: grabbing; }
+
+    .topbar {
+      position: fixed;
+      z-index: 3;
+      top: 22px;
+      left: 24px;
+      right: 24px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+
+    .brand { max-width: 460px; }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 6px;
+      color: var(--cyan);
+      font-size: 11px;
+      font-weight: 760;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 14px var(--cyan);
+      animation: breathe 2.2s ease-in-out infinite;
+    }
+
+    @keyframes breathe { 50% { opacity: .45; transform: scale(.72); } }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(22px, 3vw, 36px);
+      font-weight: 680;
+      letter-spacing: -.035em;
+    }
+
+    .subtitle {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .time-card {
+      min-width: 168px;
+      padding: 11px 14px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: rgba(7, 10, 18, .62);
+      backdrop-filter: blur(14px);
+      text-align: right;
+    }
+
+    .time-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: .12em;
+    }
+
+    .time-card strong {
+      display: block;
+      margin-top: 3px;
+      font-variant-numeric: tabular-nums;
+      font-size: 17px;
+      font-weight: 580;
+    }
+
+    .panel {
+      position: fixed;
+      z-index: 4;
+      top: 128px;
+      left: 24px;
+      width: 360px;
+      max-height: calc(100vh - 158px);
+      overflow: auto;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: 0 22px 70px rgba(0, 0, 0, .32);
+      backdrop-filter: blur(20px) saturate(130%);
+      scrollbar-width: thin;
+    }
+
+    .section + .section {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid var(--line);
+    }
+
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 650;
+      letter-spacing: .08em;
+    }
+
+    .label-row output {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0;
+    }
+
+    select {
+      width: 100%;
+      height: 40px;
+      padding: 0 11px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      color: var(--text);
+      background: rgba(255, 255, 255, .055);
+      cursor: pointer;
+    }
+
+    select:focus { border-color: rgba(111, 231, 255, .42); }
+    select + .stat { margin-top: 8px; }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    button {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--text);
+      background: rgba(255, 255, 255, .055);
+      cursor: pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, .10);
+      border-color: rgba(255, 255, 255, .18);
+    }
+
+    button:active { transform: translateY(1px); }
+
+    button.primary {
+      border-color: rgba(111, 231, 255, .3);
+      color: #041015;
+      background: linear-gradient(135deg, #9ff0ff, #65d5f5);
+      font-weight: 720;
+    }
+
+    button.primary:hover { background: linear-gradient(135deg, #c2f7ff, #78def9); }
+
+    input[type="range"] {
+      width: 100%;
+      height: 4px;
+      margin: 5px 0 1px;
+      appearance: none;
+      border-radius: 99px;
+      outline: none;
+      background: linear-gradient(90deg, var(--cyan) var(--fill, 25%), rgba(255,255,255,.11) 0);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      width: 15px;
+      height: 15px;
+      appearance: none;
+      border: 3px solid #071019;
+      border-radius: 50%;
+      background: #d9faff;
+      box-shadow: 0 0 0 1px rgba(111, 231, 255, .35), 0 0 13px rgba(111, 231, 255, .35);
+      cursor: pointer;
+    }
+
+    .switches {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .switch {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 36px;
+      padding: 0 9px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: #cbd2e4;
+      font-size: 11px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .switch input {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      accent-color: var(--cyan);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .stat {
+      padding: 9px 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .035);
+    }
+
+    .stat span {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 9px;
+      letter-spacing: .08em;
+    }
+
+    .stat strong {
+      display: block;
+      overflow: hidden;
+      font-size: 12px;
+      font-weight: 580;
+      font-variant-numeric: tabular-nums;
+      text-overflow: ellipsis;
+    }
+
+    .condition-note {
+      margin: -2px 0 9px;
+      color: #76819a;
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .unit-grid,
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .field-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .body-editor {
+      margin-top: 9px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: rgba(255, 255, 255, .025);
+    }
+
+    .body-editor-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 8px;
+      color: #dce4f7;
+      font-size: 10px;
+      font-weight: 650;
+    }
+
+    .body-mark {
+      width: 8px;
+      height: 8px;
+      margin: 0;
+      border-radius: 50%;
+      background: var(--body-color);
+      box-shadow: 0 0 8px var(--body-color);
+    }
+
+    .number-field {
+      display: block;
+      min-width: 0;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.3;
+    }
+
+    .number-field span { display: block; margin: 0 0 4px 2px; }
+
+    .number-field input {
+      width: 100%;
+      min-width: 0;
+      height: 31px;
+      padding: 0 6px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      outline: none;
+      color: #e9efff;
+      background: rgba(255, 255, 255, .045);
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .number-field input:focus {
+      border-color: rgba(111, 231, 255, .45);
+      background: rgba(111, 231, 255, .07);
+    }
+
+    .apply-conditions { width: 100%; margin-top: 9px; }
+
+    .legend {
+      position: fixed;
+      z-index: 3;
+      right: 24px;
+      bottom: 24px;
+      display: flex;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .hint {
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      color: #77819a;
+      background: rgba(6, 9, 16, .58);
+      font-size: 10px;
+      backdrop-filter: blur(10px);
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 8;
+      left: 50%;
+      bottom: 30px;
+      padding: 9px 14px;
+      border: 1px solid rgba(111, 231, 255, .18);
+      border-radius: 99px;
+      color: #dffaff;
+      background: rgba(7, 14, 22, .88);
+      font-size: 11px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 12px);
+      transition: .25s ease;
+    }
+
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 720px) {
+      .topbar { top: 16px; left: 16px; right: 16px; }
+      .subtitle { display: none; }
+      .time-card { min-width: 122px; padding: 8px 10px; }
+      .time-card strong { font-size: 14px; }
+      .panel {
+        top: auto;
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        width: auto;
+        max-height: 43vh;
+        padding: 13px;
+      }
+      .legend { display: none; }
+      .section + .section { margin-top: 11px; padding-top: 11px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="space" aria-label="三体引力模拟画布"></canvas>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="eyebrow"><i class="pulse"></i>REAL-TIME GRAVITY LAB</div>
+      <h1>引力剧场</h1>
+      <div class="subtitle" id="modelDescription">三维牛顿万有引力 · Velocity Verlet 积分 · 实时守恒量监测</div>
+    </div>
+    <div class="time-card">
+      <span>延迟回放时间 · T</span>
+      <strong id="simTime">0.000</strong>
+    </div>
+  </header>
+
+  <aside class="panel" aria-label="模拟控制台">
+    <section class="section">
+      <div class="label-row"><span>初始构型</span></div>
+      <select id="preset">
+        <option value="figure8">八字舞 · 周期轨道</option>
+        <option value="chaos">混沌三角 · 高敏感</option>
+        <option value="binary">双星与访客 · 散射</option>
+        <option value="planetary">层级系统 · 双行星</option>
+        <option value="custom" disabled>自定义初始条件</option>
+      </select>
+      <div class="button-row">
+        <button class="primary" id="toggle">暂停</button>
+        <button id="reset">重置</button>
+        <button id="random">随机</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="label-row"><span>时间加速</span><output id="computeRate">60 次/s</output></div>
+      <select id="timeScale" aria-label="时间加速倍率">
+        <option value="0.5">0.5× · 30 次/s</option>
+        <option value="1" selected>1× · 60 次/s</option>
+        <option value="2">2× · 120 次/s</option>
+        <option value="4">4× · 240 次/s</option>
+        <option value="8">8× · 480 次/s</option>
+      </select>
+      <div class="stat"><span>计算领先于画面</span><strong id="bufferLead">3.000 s</strong></div>
+    </section>
+
+    <section class="section">
+      <div class="switches">
+        <label class="switch"><input id="trails" type="checkbox" checked>轨迹尾迹</label>
+        <label class="switch"><input id="vectors" type="checkbox">速度矢量</label>
+        <label class="switch"><input id="tracking" type="checkbox" checked>跟随质心</label>
+        <label class="switch"><input id="view3d" type="checkbox">3D 透视 · V</label>
+        <label class="switch"><input id="autoOrbit" type="checkbox">自动环绕</label>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="label-row"><span>自定义初始条件</span><output>M / r / v</output></div>
+      <p class="condition-note">输入质量、三维位置、速率和方向。采用一致单位制；不会自动修正你输入的速度。</p>
+      <div class="unit-grid">
+        <label class="number-field"><span>引力常数 G</span><input id="gravityConstant" type="number" min="0" step="any" value="1"></label>
+        <label class="number-field"><span>内部最大步长 Δt</span><input id="timeStep" type="number" min="0.0000001" step="any" value="0.0016666666666667"></label>
+      </div>
+      <div id="conditionRows"></div>
+      <button class="primary apply-conditions" id="applyConditions">严格按输入初值从 T = 0 开始</button>
+      <p class="condition-note" style="margin-top:8px">方位角 θ：0° 指向 +X，90° 指向 +Y。仰角 φ：0° 位于 XY 平面，90° 指向 +Z。SI 制可填写 G = 6.67430e−11。</p>
+    </section>
+
+    <section class="section">
+      <div class="label-row"><span>系统状态</span><output id="bodyCount">3 个天体</output></div>
+      <div class="stats">
+        <div class="stat"><span>总能量 E</span><strong id="energy">—</strong></div>
+        <div class="stat"><span>相对漂移 ΔE</span><strong id="drift">—</strong></div>
+        <div class="stat"><span>角动量基准 |L₀|</span><strong id="angular">—</strong></div>
+        <div class="stat"><span>角动量误差 ΔL</span><strong id="angularDrift">—</strong></div>
+        <div class="stat"><span>质心速度</span><strong id="comSpeed">—</strong></div>
+      </div>
+    </section>
+  </aside>
+
+  <div class="legend">
+    <span class="hint">拖动 · 平移视角</span>
+    <span class="hint">滚轮 · 缩放</span>
+    <span class="hint">Space · 暂停</span>
+    <span class="hint">R · 重置</span>
+    <span class="hint">V · 3D 视角</span>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const canvas = document.querySelector('#space');
+      const ctx = canvas.getContext('2d', { alpha: false });
+      const $ = (selector) => document.querySelector(selector);
+      const ui = {
+        preset: $('#preset'), toggle: $('#toggle'), reset: $('#reset'), random: $('#random'),
+        trails: $('#trails'), bufferLead: $('#bufferLead'),
+        timeScale: $('#timeScale'), computeRate: $('#computeRate'),
+        vectors: $('#vectors'), tracking: $('#tracking'),
+        view3d: $('#view3d'), autoOrbit: $('#autoOrbit'), modelDescription: $('#modelDescription'),
+        simTime: $('#simTime'), energy: $('#energy'), drift: $('#drift'),
+        angular: $('#angular'), angularDrift: $('#angularDrift'),
+        comSpeed: $('#comSpeed'), bodyCount: $('#bodyCount'),
+        conditionRows: $('#conditionRows'), applyConditions: $('#applyConditions'),
+        gravityConstant: $('#gravityConstant'), timeStep: $('#timeStep'),
+        toast: $('#toast')
+      };
+
+      const DEFAULT_G = 1;
+      const DEFAULT_STEP = 1 / 600;
+      const REALTIME_HZ = 60;
+      const FRAME_INTERVAL = 1 / REALTIME_HZ;
+      const REPLAY_DELAY = 3;
+      const PRECOMPUTE_SAMPLES = REALTIME_HZ * REPLAY_DELAY;
+      const MIN_STEP_RATIO = 1e-6;
+      const ENCOUNTER_SAFETY = 0.025;
+      const MAX_TRAIL_POINTS = 900;
+      const COLORS = ['#71e5ff', '#ff7fa8', '#b79aff'];
+      const state = {
+        bodies: [],
+        renderBodies: [],
+        replayBuffer: [],
+        playbackTrails: [],
+        playbackTime: 0,
+        initialSnapshot: null,
+        initialEnergy: 0,
+        initialAngular: { x: 0, y: 0, z: 0 },
+        gravityConstant: DEFAULT_G,
+        fixedStep: DEFAULT_STEP,
+        time: 0,
+        lastFrame: performance.now(),
+        running: true,
+        timeScale: 1,
+        realtimeAccumulator: 0,
+        statsClock: 0,
+        singularityReported: false,
+        view3D: false,
+        camera: {
+          x: 0, y: 0, z: 0, scale: 180,
+          targetX: 0, targetY: 0, targetZ: 0,
+          yaw: -0.58, pitch: 0.58, focalLength: 6.5
+        },
+        drag: null,
+        stars: [],
+        toastTimer: null
+      };
+
+      const PRESETS = {
+        figure8: {
+          name: '八字舞', scale: 0.36,
+          bodies: [
+            [1, -0.97000436,  0.24308753, 0,  0.466203685,  0.43236573, 0],
+            [1,  0.97000436, -0.24308753, 0,  0.466203685,  0.43236573, 0],
+            [1,  0,           0,          0, -0.93240737, -0.86473146, 0]
+          ]
+        },
+        chaos: {
+          name: '混沌三角', scale: 0.32,
+          bodies: [
+            [1.18, -0.92, -0.18, -0.26,  0.24,  0.48,  0.13],
+            [0.92,  0.79, -0.42,  0.18, -0.46,  0.28, -0.09],
+            [1.06,  0.16,  0.94,  0.09,  0.19, -0.71, -0.07]
+          ]
+        },
+        binary: {
+          name: '双星与访客', scale: 0.23,
+          bodies: [
+            [2.6, -0.52, 0, 0, 0, -0.94, -0.28],
+            [2.6,  0.52, 0, 0, 0,  0.94,  0.28],
+            [0.72, -3.15, 0.92, -0.55, 1.78, -0.12, 0.22]
+          ]
+        },
+        planetary: {
+          name: '层级系统', scale: 0.2,
+          bodies: [
+            [14, 0, 0, 0, 0, 0, 0],
+            [0.42, 1.35, 0, 0.18, 0, 3.15, 0.42],
+            [0.64, -2.1, 0, -0.24, 0, -2.49, 0.33]
+          ]
+        }
+      };
+
+      function makeBody([mass, x, y, z, vx, vy, vz], index) {
+        return {
+          id: `${Date.now()}-${index}-${Math.random()}`,
+          mass, x, y, z, vx, vy, vz, ax: 0, ay: 0, az: 0,
+          color: COLORS[index % COLORS.length],
+          trail: [],
+          radius: 0.032 * Math.cbrt(mass) + 0.018
+        };
+      }
+
+      function cloneBodies(bodies) {
+        return bodies.map((body) => ({ ...body, trail: body.trail.map((p) => ({ ...p })) }));
+      }
+
+      function visibleBodies() {
+        return state.renderBodies.length ? state.renderBodies : state.bodies;
+      }
+
+      function capturePhysicsSnapshot() {
+        return {
+          time: state.time,
+          bodies: state.bodies.map((body) => ({ ...body, trail: [] }))
+        };
+      }
+
+      function showReplaySnapshot(snapshot, recordTrail = true) {
+        state.playbackTime = snapshot.time;
+        if (state.playbackTrails.length !== snapshot.bodies.length) {
+          state.playbackTrails = snapshot.bodies.map(() => []);
+        }
+        state.renderBodies = snapshot.bodies.map((body, index) => {
+          const trail = state.playbackTrails[index];
+          if (recordTrail) {
+            trail.push({ x: body.x, y: body.y, z: body.z });
+            if (trail.length > MAX_TRAIL_POINTS) trail.shift();
+          }
+          return { ...body, trail };
+        });
+      }
+
+      function advancePhysicsBy(duration) {
+        let remaining = duration;
+        let internalSteps = 0;
+        while (remaining > Math.max(1e-14, duration * 1e-12)) {
+          const adaptiveStep = adaptiveStepLimit();
+          if (!Number.isFinite(adaptiveStep) || adaptiveStep < state.fixedStep * MIN_STEP_RATIO) {
+            state.running = false;
+            ui.toggle.textContent = '继续';
+            showToast('近距离引力使所需步长低于数值极限，模拟已暂停');
+            return false;
+          }
+          const step = Math.min(state.fixedStep, adaptiveStep, remaining);
+          integrate(step);
+          remaining -= step;
+          internalSteps++;
+          if (!state.running || internalSteps > 50000) {
+            state.running = false;
+            ui.toggle.textContent = '继续';
+            if (internalSteps > 50000) showToast('单个 60 Hz 节拍需要过多子步，模拟已暂停');
+            return false;
+          }
+        }
+        return true;
+      }
+
+      function initializeReplayBuffer() {
+        state.replayBuffer = [];
+        state.playbackTrails = state.bodies.map(() => []);
+        state.renderBodies = [];
+        state.playbackTime = 0;
+        state.realtimeAccumulator = 0;
+        state.running = true;
+        ui.toggle.textContent = '暂停';
+        showReplaySnapshot(capturePhysicsSnapshot());
+        for (let sample = 0; sample < PRECOMPUTE_SAMPLES; sample++) {
+          if (!advancePhysicsBy(FRAME_INTERVAL)) break;
+          state.replayBuffer.push(capturePhysicsSnapshot());
+        }
+        const lead = state.time - state.playbackTime;
+        ui.bufferLead.textContent = `${lead.toFixed(3)} s`;
+        return state.replayBuffer.length === PRECOMPUTE_SAMPLES;
+      }
+
+      function removeSystemDrift(bodies) {
+        const totalMass = bodies.reduce((sum, b) => sum + b.mass, 0);
+        const px = bodies.reduce((sum, b) => sum + b.mass * b.vx, 0) / totalMass;
+        const py = bodies.reduce((sum, b) => sum + b.mass * b.vy, 0) / totalMass;
+        const pz = bodies.reduce((sum, b) => sum + b.mass * b.vz, 0) / totalMass;
+        bodies.forEach((b) => { b.vx -= px; b.vy -= py; b.vz -= pz; });
+      }
+
+      function setConservationBaseline() {
+        const d = diagnostics();
+        state.initialEnergy = d.energy;
+        state.initialAngular = { ...d.angularVector };
+        state.singularityReported = false;
+      }
+
+      function formatConditionValue(value) {
+        if (value === 0) return '0';
+        if (Math.abs(value) >= 1e6 || Math.abs(value) < 1e-5) return value.toExponential(8);
+        return Number(value.toPrecision(9)).toString();
+      }
+
+      function populateInitialEditor() {
+        ui.gravityConstant.value = state.gravityConstant;
+        ui.timeStep.value = state.fixedStep;
+        ui.conditionRows.innerHTML = state.bodies.map((b, index) => {
+          const speed = Math.hypot(b.vx, b.vy, b.vz);
+          const azimuth = speed === 0 ? 0 : Math.atan2(b.vy, b.vx) * 180 / Math.PI;
+          const elevation = speed === 0 ? 0 : Math.asin(Math.max(-1, Math.min(1, b.vz / speed))) * 180 / Math.PI;
+          const field = (label, name, value, attributes = '') => `
+            <label class="number-field"><span>${label}</span>
+              <input type="number" step="any" data-field="${name}" value="${formatConditionValue(value)}" ${attributes} aria-label="天体 ${index + 1} ${label}">
+            </label>`;
+          return `
+          <div class="body-editor" data-index="${index}">
+            <div class="body-editor-title"><i class="body-mark" style="--body-color:${b.color}"></i>天体 M${index + 1}</div>
+            <div class="field-grid">
+              ${field('质量 M', 'mass', b.mass, 'min="0"')}
+              ${field('位置 X', 'x', b.x)}
+              ${field('位置 Y', 'y', b.y)}
+              ${field('深度 Z', 'z', b.z)}
+              ${field('速率 |v|', 'speed', speed, 'min="0"')}
+              ${field('方位角 θ°', 'azimuth', azimuth)}
+              ${field('仰角 φ°', 'elevation', elevation, 'min="-90" max="90"')}
+            </div>
+          </div>
+        `;
+        }).join('');
+      }
+
+      function applyInitialConditions() {
+        const rows = [...ui.conditionRows.querySelectorAll('.body-editor')];
+        const values = rows.map((row) => {
+          const read = (field) => Number(row.querySelector(`[data-field="${field}"]`).value);
+          return {
+            mass: read('mass'), x: read('x'), y: read('y'), z: read('z'),
+            speed: read('speed'), azimuth: read('azimuth'), elevation: read('elevation')
+          };
+        });
+        const gravityConstant = Number(ui.gravityConstant.value);
+        const fixedStep = Number(ui.timeStep.value);
+        if (!Number.isFinite(gravityConstant) || gravityConstant <= 0 || !Number.isFinite(fixedStep) || fixedStep <= 0) {
+          showToast('参数无效：G 与固定步长必须是大于 0 的有限数值');
+          return;
+        }
+        if (values.some((v) =>
+          ![v.mass, v.x, v.y, v.z, v.speed, v.azimuth, v.elevation].every(Number.isFinite) ||
+          v.mass <= 0 || v.speed < 0 || Math.abs(v.elevation) > 90
+        )) {
+          showToast('参数无效：质量须大于 0、速率须非负、仰角须在 −90° 至 90°');
+          return;
+        }
+        for (let i = 0; i < values.length; i++) {
+          for (let j = i + 1; j < values.length; j++) {
+            if (Math.hypot(
+              values[j].x - values[i].x,
+              values[j].y - values[i].y,
+              values[j].z - values[i].z
+            ) === 0) {
+              showToast('参数无效：两个点质量不能处在完全相同的位置');
+              return;
+            }
+          }
+        }
+        state.bodies = values.map((v, index) => {
+          const theta = v.azimuth * Math.PI / 180;
+          const phi = v.elevation * Math.PI / 180;
+          const horizontalSpeed = v.speed * Math.cos(phi);
+          return makeBody([
+            v.mass, v.x, v.y, v.z,
+            horizontalSpeed * Math.cos(theta),
+            horizontalSpeed * Math.sin(theta),
+            v.speed * Math.sin(phi)
+          ], index);
+        });
+        state.gravityConstant = gravityConstant;
+        state.fixedStep = fixedStep;
+        computeAccelerations();
+        state.time = 0;
+        setConservationBaseline();
+        state.initialSnapshot = cloneBodies(state.bodies);
+        ui.preset.value = 'custom';
+        fitBodies();
+        populateInitialEditor();
+        const buffered = initializeReplayBuffer();
+        updateStats(true);
+        if (buffered) showToast(`已预算 3 秒；正以 ${REALTIME_HZ * state.timeScale} 次/s 延迟回放`);
+      }
+
+      function loadPreset(key, announce = true) {
+        const preset = PRESETS[key];
+        if (!preset) return;
+        state.gravityConstant = DEFAULT_G;
+        state.fixedStep = DEFAULT_STEP;
+        state.bodies = preset.bodies.map(makeBody);
+        removeSystemDrift(state.bodies);
+        computeAccelerations();
+        state.time = 0;
+        setConservationBaseline();
+        state.initialSnapshot = cloneBodies(state.bodies);
+        fitView(preset.scale);
+        populateInitialEditor();
+        const buffered = initializeReplayBuffer();
+        updateStats(true);
+        if (announce && buffered) showToast(`「${preset.name}」已预算 3 秒并以 ${state.timeScale}× 回放`);
+      }
+
+      function resetSimulation() {
+        state.bodies = cloneBodies(state.initialSnapshot);
+        computeAccelerations();
+        state.time = 0;
+        setConservationBaseline();
+        if (PRESETS[ui.preset.value]) fitView(PRESETS[ui.preset.value].scale);
+        else fitBodies();
+        populateInitialEditor();
+        const buffered = initializeReplayBuffer();
+        updateStats(true);
+        if (buffered) showToast(`已重新预算 3 秒并从 T = 0 以 ${state.timeScale}× 回放`);
+      }
+
+      function randomSystem() {
+        const bodies = [];
+        const phase = Math.random() * Math.PI * 2;
+        for (let i = 0; i < 3; i++) {
+          const angle = phase + i * Math.PI * 2 / 3 + (Math.random() - .5) * .65;
+          const distance = .62 + Math.random() * .72;
+          const mass = .65 + Math.random() * .9;
+          const orbital = .42 + Math.random() * .48;
+          bodies.push(makeBody([
+            mass,
+            Math.cos(angle) * distance,
+            Math.sin(angle) * distance,
+            (Math.random() - .5) * .7,
+            -Math.sin(angle) * orbital + (Math.random() - .5) * .24,
+            Math.cos(angle) * orbital + (Math.random() - .5) * .24,
+            (Math.random() - .5) * .36
+          ], i));
+        }
+        removeSystemDrift(bodies);
+        state.gravityConstant = DEFAULT_G;
+        state.fixedStep = DEFAULT_STEP;
+        state.bodies = bodies;
+        computeAccelerations();
+        state.time = 0;
+        setConservationBaseline();
+        state.initialSnapshot = cloneBodies(state.bodies);
+        ui.preset.value = 'custom';
+        fitBodies();
+        populateInitialEditor();
+        const buffered = initializeReplayBuffer();
+        updateStats(true);
+        if (buffered) showToast(`随机系统已预算 3 秒并以 ${state.timeScale}× 回放`);
+      }
+
+      function computeAccelerations() {
+        for (const b of state.bodies) { b.ax = 0; b.ay = 0; b.az = 0; }
+        for (let i = 0; i < state.bodies.length; i++) {
+          for (let j = i + 1; j < state.bodies.length; j++) {
+            const a = state.bodies[i];
+            const b = state.bodies[j];
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const dz = b.z - a.z;
+            const r2 = dx * dx + dy * dy + dz * dz;
+            if (r2 === 0) {
+              state.running = false;
+              ui.toggle.textContent = '继续';
+              if (!state.singularityReported) {
+                state.singularityReported = true;
+                showToast('点质量位置重合：牛顿引力在此处为奇点，模拟已暂停');
+              }
+              continue;
+            }
+            const invR3 = 1 / (r2 * Math.sqrt(r2));
+            a.ax += state.gravityConstant * b.mass * dx * invR3;
+            a.ay += state.gravityConstant * b.mass * dy * invR3;
+            a.az += state.gravityConstant * b.mass * dz * invR3;
+            b.ax -= state.gravityConstant * a.mass * dx * invR3;
+            b.ay -= state.gravityConstant * a.mass * dy * invR3;
+            b.az -= state.gravityConstant * a.mass * dz * invR3;
+          }
+        }
+      }
+
+      function adaptiveStepLimit() {
+        let limit = state.fixedStep;
+        for (let i = 0; i < state.bodies.length; i++) {
+          for (let j = i + 1; j < state.bodies.length; j++) {
+            const a = state.bodies[i];
+            const b = state.bodies[j];
+            const r = Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z);
+            if (r === 0) return 0;
+            const encounterStep = ENCOUNTER_SAFETY * Math.sqrt(
+              r ** 3 / (state.gravityConstant * (a.mass + b.mass))
+            );
+            const relativeSpeed = Math.hypot(b.vx - a.vx, b.vy - a.vy, b.vz - a.vz);
+            const crossingStep = relativeSpeed > 0 ? ENCOUNTER_SAFETY * r / relativeSpeed : Infinity;
+            limit = Math.min(limit, encounterStep, crossingStep);
+          }
+        }
+        return limit;
+      }
+
+      function integrate(dt) {
+        for (const b of state.bodies) {
+          b.vx += b.ax * dt * .5;
+          b.vy += b.ay * dt * .5;
+          b.vz += b.az * dt * .5;
+          b.x += b.vx * dt;
+          b.y += b.vy * dt;
+          b.z += b.vz * dt;
+        }
+        computeAccelerations();
+        for (const b of state.bodies) {
+          b.vx += b.ax * dt * .5;
+          b.vy += b.ay * dt * .5;
+          b.vz += b.az * dt * .5;
+        }
+        state.time += dt;
+      }
+
+      function centerOfMass(bodies = state.bodies) {
+        const total = bodies.reduce((sum, b) => sum + b.mass, 0) || 1;
+        return {
+          x: bodies.reduce((sum, b) => sum + b.x * b.mass, 0) / total,
+          y: bodies.reduce((sum, b) => sum + b.y * b.mass, 0) / total,
+          z: bodies.reduce((sum, b) => sum + b.z * b.mass, 0) / total,
+          vx: bodies.reduce((sum, b) => sum + b.vx * b.mass, 0) / total,
+          vy: bodies.reduce((sum, b) => sum + b.vy * b.mass, 0) / total,
+          vz: bodies.reduce((sum, b) => sum + b.vz * b.mass, 0) / total
+        };
+      }
+
+      function diagnostics(bodies = state.bodies) {
+        let kinetic = 0;
+        let potential = 0;
+        let lx = 0;
+        let ly = 0;
+        let lz = 0;
+        for (const b of bodies) {
+          kinetic += .5 * b.mass * (b.vx * b.vx + b.vy * b.vy + b.vz * b.vz);
+          lx += b.mass * (b.y * b.vz - b.z * b.vy);
+          ly += b.mass * (b.z * b.vx - b.x * b.vz);
+          lz += b.mass * (b.x * b.vy - b.y * b.vx);
+        }
+        for (let i = 0; i < bodies.length; i++) {
+          for (let j = i + 1; j < bodies.length; j++) {
+            const a = bodies[i];
+            const b = bodies[j];
+            const r = Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z);
+            potential -= state.gravityConstant * a.mass * b.mass / r;
+          }
+        }
+        return {
+          energy: kinetic + potential,
+          angular: Math.hypot(lx, ly, lz),
+          angularVector: { x: lx, y: ly, z: lz },
+          com: centerOfMass(bodies)
+        };
+      }
+
+      function compactNumber(value) {
+        if (!Number.isFinite(value)) return '—';
+        if (Math.abs(value) >= 1000 || (Math.abs(value) < .001 && value !== 0)) return value.toExponential(3);
+        return value.toFixed(4);
+      }
+
+      function updateStats(force = false) {
+        if (!force && state.statsClock < .12) return;
+        state.statsClock = 0;
+        const shownBodies = visibleBodies();
+        const d = diagnostics(shownBodies);
+        const drift = state.initialEnergy === 0 ? 0 : (d.energy - state.initialEnergy) / Math.abs(state.initialEnergy);
+        const angularError = Math.hypot(
+          d.angularVector.x - state.initialAngular.x,
+          d.angularVector.y - state.initialAngular.y,
+          d.angularVector.z - state.initialAngular.z
+        );
+        const initialAngularMagnitude = Math.hypot(
+          state.initialAngular.x, state.initialAngular.y, state.initialAngular.z
+        );
+        const relativeAngularError = initialAngularMagnitude > 1e-12
+          ? angularError / initialAngularMagnitude
+          : null;
+        ui.simTime.textContent = state.playbackTime.toFixed(3);
+        ui.energy.textContent = compactNumber(d.energy);
+        ui.drift.textContent = `${drift >= 0 ? '+' : ''}${(drift * 100).toFixed(4)}%`;
+        ui.drift.style.color = Math.abs(drift) > .002 ? '#ff9cb3' : '#aeb8cf';
+        ui.angular.textContent = compactNumber(initialAngularMagnitude);
+        ui.angularDrift.textContent = relativeAngularError === null
+          ? `${compactNumber(angularError)} abs`
+          : `${(relativeAngularError * 100).toExponential(2)}%`;
+        ui.angularDrift.style.color = (relativeAngularError ?? angularError) > 1e-5 ? '#ffcf91' : '#aeb8cf';
+        ui.comSpeed.textContent = compactNumber(Math.hypot(d.com.vx, d.com.vy, d.com.vz));
+        ui.bodyCount.textContent = `${shownBodies.length} 个天体`;
+        ui.bufferLead.textContent = `${Math.max(0, state.time - state.playbackTime).toFixed(3)} s`;
+      }
+
+      function resize() {
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        const width = innerWidth;
+        const height = innerHeight;
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        createStars(width, height);
+      }
+
+      function createStars(width, height) {
+        const count = Math.min(260, Math.floor(width * height / 6500));
+        state.stars = Array.from({ length: count }, () => ({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          r: Math.random() * 1.15 + .15,
+          a: Math.random() * .5 + .12,
+          layer: Math.random() * .45 + .08
+        }));
+      }
+
+      function fitView(scaleRatio) {
+        const com = centerOfMass();
+        state.camera.x = state.camera.targetX = com.x;
+        state.camera.y = state.camera.targetY = com.y;
+        state.camera.z = state.camera.targetZ = com.z;
+        state.camera.scale = Math.max(70, Math.min(innerWidth, innerHeight) * scaleRatio);
+      }
+
+      function fitBodies() {
+        const com = centerOfMass();
+        state.camera.x = state.camera.targetX = com.x;
+        state.camera.y = state.camera.targetY = com.y;
+        state.camera.z = state.camera.targetZ = com.z;
+        const radius = Math.max(
+          ...state.bodies.map((b) => Math.hypot(b.x - com.x, b.y - com.y, b.z - com.z)),
+          1e-12
+        );
+        state.camera.scale = Math.max(1e-12, Math.min(1e12,
+          Math.min(innerWidth, innerHeight) * .34 / radius
+        ));
+      }
+
+      function worldToScreen(x, y, z = 0) {
+        if (state.view3D) {
+          const dx = x - state.camera.x;
+          const dy = y - state.camera.y;
+          const dz = z - state.camera.z;
+          const cy = Math.cos(state.camera.yaw);
+          const sy = Math.sin(state.camera.yaw);
+          const cp = Math.cos(state.camera.pitch);
+          const sp = Math.sin(state.camera.pitch);
+          const rx = cy * dx - sy * dy;
+          const ry = sy * dx + cy * dy;
+          const vertical = cp * ry + sp * dz;
+          const depth = sp * ry - cp * dz;
+          const rawPerspective = state.camera.focalLength / (state.camera.focalLength + depth);
+          const perspective = Math.max(.22, Math.min(3.2, rawPerspective));
+          return {
+            x: innerWidth / 2 + rx * state.camera.scale * perspective,
+            y: innerHeight / 2 - vertical * state.camera.scale * perspective,
+            depth,
+            perspective
+          };
+        }
+        return {
+          x: innerWidth / 2 + (x - state.camera.x) * state.camera.scale,
+          y: innerHeight / 2 - (y - state.camera.y) * state.camera.scale,
+          depth: 0,
+          perspective: 1
+        };
+      }
+
+      function screenToWorld(x, y) {
+        return {
+          x: state.camera.x + (x - innerWidth / 2) / state.camera.scale,
+          y: state.camera.y - (y - innerHeight / 2) / state.camera.scale
+        };
+      }
+
+      function drawBackground() {
+        const width = innerWidth;
+        const height = innerHeight;
+        const bg = ctx.createRadialGradient(width * .63, height * .42, 0, width * .63, height * .42, Math.max(width, height) * .85);
+        bg.addColorStop(0, '#0c1223');
+        bg.addColorStop(.45, '#070b15');
+        bg.addColorStop(1, '#03050a');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, width, height);
+
+        for (const star of state.stars) {
+          const px = ((star.x - state.camera.x * state.camera.scale * star.layer) % width + width) % width;
+          const py = ((star.y + state.camera.y * state.camera.scale * star.layer) % height + height) % height;
+          ctx.globalAlpha = star.a;
+          ctx.fillStyle = '#dbe7ff';
+          ctx.beginPath();
+          ctx.arc(px, py, star.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      function niceGridStep() {
+        const desiredWorld = 90 / state.camera.scale;
+        const power = 10 ** Math.floor(Math.log10(desiredWorld));
+        const normalized = desiredWorld / power;
+        return (normalized < 2 ? 2 : normalized < 5 ? 5 : 10) * power;
+      }
+
+      function drawGrid() {
+        if (state.view3D) {
+          draw3DGrid();
+          return;
+        }
+        const step = niceGridStep();
+        const left = screenToWorld(0, 0).x;
+        const right = screenToWorld(innerWidth, 0).x;
+        const top = screenToWorld(0, 0).y;
+        const bottom = screenToWorld(0, innerHeight).y;
+        ctx.save();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(130, 159, 210, .055)';
+        ctx.beginPath();
+        for (let x = Math.floor(left / step) * step; x <= right; x += step) {
+          const sx = worldToScreen(x, 0).x;
+          ctx.moveTo(sx, 0);
+          ctx.lineTo(sx, innerHeight);
+        }
+        for (let y = Math.floor(bottom / step) * step; y <= top; y += step) {
+          const sy = worldToScreen(0, y).y;
+          ctx.moveTo(0, sy);
+          ctx.lineTo(innerWidth, sy);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function draw3DGrid() {
+        const step = niceGridStep();
+        const extent = Math.max(innerWidth, innerHeight) / state.camera.scale * 1.05;
+        const minX = Math.floor((state.camera.x - extent) / step) * step;
+        const maxX = Math.ceil((state.camera.x + extent) / step) * step;
+        const minY = Math.floor((state.camera.y - extent) / step) * step;
+        const maxY = Math.ceil((state.camera.y + extent) / step) * step;
+        ctx.save();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(130, 159, 210, .085)';
+        ctx.beginPath();
+        for (let x = minX; x <= maxX + step * .1; x += step) {
+          const a = worldToScreen(x, minY, 0);
+          const b = worldToScreen(x, maxY, 0);
+          ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+        }
+        for (let y = minY; y <= maxY + step * .1; y += step) {
+          const a = worldToScreen(minX, y, 0);
+          const b = worldToScreen(maxX, y, 0);
+          ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+        }
+        ctx.stroke();
+
+        const x1 = worldToScreen(minX, 0, 0), x2 = worldToScreen(maxX, 0, 0);
+        const y1 = worldToScreen(0, minY, 0), y2 = worldToScreen(0, maxY, 0);
+        ctx.lineWidth = 1.25;
+        ctx.strokeStyle = 'rgba(111, 231, 255, .24)';
+        ctx.beginPath(); ctx.moveTo(x1.x, x1.y); ctx.lineTo(x2.x, x2.y); ctx.stroke();
+        ctx.strokeStyle = 'rgba(255, 127, 168, .20)';
+        ctx.beginPath(); ctx.moveTo(y1.x, y1.y); ctx.lineTo(y2.x, y2.y); ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawTrails() {
+        if (!ui.trails.checked) return;
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        for (const b of visibleBodies()) {
+          if (b.trail.length < 2) continue;
+          const start = Math.max(0, b.trail.length - MAX_TRAIL_POINTS);
+          for (let pass = 0; pass < 2; pass++) {
+            ctx.beginPath();
+            for (let i = start; i < b.trail.length; i++) {
+              const p = worldToScreen(b.trail[i].x, b.trail[i].y, b.trail[i].z);
+              if (i === start) ctx.moveTo(p.x, p.y);
+              else ctx.lineTo(p.x, p.y);
+            }
+            ctx.strokeStyle = b.color;
+            ctx.globalAlpha = pass === 0 ? .11 : .58;
+            ctx.lineWidth = pass === 0 ? 5 : 1.1;
+            ctx.shadowBlur = pass === 0 ? 13 : 4;
+            ctx.shadowColor = b.color;
+            ctx.stroke();
+          }
+        }
+        ctx.restore();
+      }
+
+      function drawCenterOfMass() {
+        const com = centerOfMass(visibleBodies());
+        const p = worldToScreen(com.x, com.y, com.z);
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.strokeStyle = 'rgba(255,255,255,.26)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(-5, 0); ctx.lineTo(5, 0);
+        ctx.moveTo(0, -5); ctx.lineTo(0, 5);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawVelocityVector(b) {
+        const p = worldToScreen(b.x, b.y, b.z);
+        const vectorScale = .16;
+        const end = worldToScreen(
+          b.x + b.vx * vectorScale,
+          b.y + b.vy * vectorScale,
+          b.z + b.vz * vectorScale
+        );
+        const ex = end.x;
+        const ey = end.y;
+        const angle = Math.atan2(ey - p.y, ex - p.x);
+        ctx.save();
+        ctx.strokeStyle = b.color;
+        ctx.fillStyle = b.color;
+        ctx.globalAlpha = .75;
+        ctx.lineWidth = 1.25;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(ex, ey);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(ex, ey);
+        ctx.lineTo(ex - 6 * Math.cos(angle - .45), ey - 6 * Math.sin(angle - .45));
+        ctx.lineTo(ex - 6 * Math.cos(angle + .45), ey - 6 * Math.sin(angle + .45));
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawBody(b, index) {
+        const p = worldToScreen(b.x, b.y, b.z);
+        const radius = Math.max(5, Math.min(25, (6 + Math.cbrt(b.mass) * 4.4) * p.perspective));
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        const halo = ctx.createRadialGradient(p.x, p.y, radius * .2, p.x, p.y, radius * 3.6);
+        halo.addColorStop(0, `${b.color}8c`);
+        halo.addColorStop(.28, `${b.color}2c`);
+        halo.addColorStop(1, `${b.color}00`);
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, radius * 3.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+
+        const sphere = ctx.createRadialGradient(p.x - radius * .3, p.y - radius * .34, radius * .05, p.x, p.y, radius);
+        sphere.addColorStop(0, '#ffffff');
+        sphere.addColorStop(.18, b.color);
+        sphere.addColorStop(.72, `${b.color}d9`);
+        sphere.addColorStop(1, '#101523');
+        ctx.fillStyle = sphere;
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = b.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = 'rgba(226, 233, 249, .72)';
+        ctx.font = '10px ui-monospace, SFMono-Regular, Consolas, monospace';
+        ctx.fillText(`M${index + 1} · ${b.mass.toFixed(2)}`, p.x + radius + 7, p.y - radius - 1);
+        ctx.restore();
+      }
+
+      function drawDepthGuides() {
+        if (!state.view3D) return;
+        ctx.save();
+        ctx.setLineDash([3, 5]);
+        ctx.lineWidth = 1;
+        for (const b of visibleBodies()) {
+          const plane = worldToScreen(b.x, b.y, 0);
+          const body = worldToScreen(b.x, b.y, b.z);
+          ctx.strokeStyle = `${b.color}3d`;
+          ctx.beginPath();
+          ctx.moveTo(plane.x, plane.y);
+          ctx.lineTo(body.x, body.y);
+          ctx.stroke();
+          ctx.fillStyle = `${b.color}66`;
+          ctx.beginPath();
+          ctx.arc(plane.x, plane.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawOrientationGizmo() {
+        if (!state.view3D) return;
+        const origin = { x: innerWidth - 62, y: 116 };
+        const cy = Math.cos(state.camera.yaw);
+        const sy = Math.sin(state.camera.yaw);
+        const cp = Math.cos(state.camera.pitch);
+        const sp = Math.sin(state.camera.pitch);
+        const project = (x, y, z) => {
+          const rx = cy * x - sy * y;
+          const ry = sy * x + cy * y;
+          return { x: rx * 27, y: -(cp * ry + sp * z) * 27 };
+        };
+        const axes = [
+          ['X', '#71e5ff', project(1, 0, 0)],
+          ['Y', '#ff7fa8', project(0, 1, 0)],
+          ['Z', '#b79aff', project(0, 0, 1)]
+        ];
+        ctx.save();
+        ctx.font = '9px ui-monospace, SFMono-Regular, Consolas, monospace';
+        ctx.lineWidth = 1.5;
+        for (const [label, color, end] of axes) {
+          ctx.strokeStyle = color;
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.moveTo(origin.x, origin.y);
+          ctx.lineTo(origin.x + end.x, origin.y + end.y);
+          ctx.stroke();
+          ctx.fillText(label, origin.x + end.x * 1.15 - 2, origin.y + end.y * 1.15 + 3);
+        }
+        ctx.fillStyle = 'rgba(255,255,255,.5)';
+        ctx.beginPath(); ctx.arc(origin.x, origin.y, 2, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+
+      function render() {
+        const bodies = visibleBodies();
+        drawBackground();
+        drawGrid();
+        drawTrails();
+        drawDepthGuides();
+        drawCenterOfMass();
+        if (ui.vectors.checked) bodies.forEach(drawVelocityVector);
+        const ordered = bodies
+          .map((body, index) => ({ body, index, depth: worldToScreen(body.x, body.y, body.z).depth }))
+          .sort((a, b) => b.depth - a.depth);
+        ordered.forEach(({ body, index }) => drawBody(body, index));
+        drawOrientationGizmo();
+      }
+
+      function frame(now) {
+        const realDelta = Math.min((now - state.lastFrame) / 1000, .05);
+        state.lastFrame = now;
+        state.statsClock += realDelta;
+
+        if (state.running) {
+          state.realtimeAccumulator += realDelta * state.timeScale;
+          let realtimeTicks = 0;
+          while (state.realtimeAccumulator >= FRAME_INTERVAL && realtimeTicks < 24) {
+            if (!advancePhysicsBy(FRAME_INTERVAL)) break;
+            state.replayBuffer.push(capturePhysicsSnapshot());
+            const replaySnapshot = state.replayBuffer.shift();
+            if (replaySnapshot) showReplaySnapshot(replaySnapshot);
+            state.realtimeAccumulator -= FRAME_INTERVAL;
+            realtimeTicks++;
+          }
+          if (realtimeTicks === 24) {
+            state.realtimeAccumulator = Math.min(state.realtimeAccumulator, FRAME_INTERVAL);
+          }
+        }
+
+        const shownBodies = visibleBodies();
+        if (ui.tracking.checked && shownBodies.length) {
+          const com = centerOfMass(shownBodies);
+          state.camera.targetX = com.x;
+          state.camera.targetY = com.y;
+          state.camera.targetZ = com.z;
+          state.camera.x += (state.camera.targetX - state.camera.x) * .055;
+          state.camera.y += (state.camera.targetY - state.camera.y) * .055;
+          state.camera.z += (state.camera.targetZ - state.camera.z) * .055;
+        }
+        if (state.view3D && ui.autoOrbit.checked) state.camera.yaw += realDelta * .16;
+
+        updateStats();
+        render();
+        requestAnimationFrame(frame);
+      }
+
+      function toggleRunning() {
+        state.running = !state.running;
+        ui.toggle.textContent = state.running ? '暂停' : '继续';
+        ui.toggle.setAttribute('aria-pressed', String(!state.running));
+      }
+
+      function updateTimeScale(announce = true) {
+        const requested = Number(ui.timeScale.value);
+        state.timeScale = [0.5, 1, 2, 4, 8].includes(requested) ? requested : 1;
+        const operationsPerSecond = REALTIME_HZ * state.timeScale;
+        ui.computeRate.textContent = `${operationsPerSecond} 次/s`;
+        if (announce) {
+          showToast(`${state.timeScale}×：每个现实秒计算并呈现 ${operationsPerSecond} 个固定物理节拍`);
+        }
+      }
+
+      function set3DView(enabled, announce = true) {
+        state.view3D = Boolean(enabled);
+        ui.view3d.checked = state.view3D;
+        ui.autoOrbit.disabled = !state.view3D;
+        ui.modelDescription.textContent = state.view3D
+          ? '三维牛顿引力 · 透视轨道相机 · 三轴守恒量监测'
+          : '三维牛顿引力 · XY 正交投影 · 三轴守恒量监测';
+        if (announce) {
+          showToast(state.view3D
+            ? '3D 视角：拖动环绕，Shift + 拖动平移，滚轮缩放'
+            : '已返回 XY 平面正交视图');
+        }
+      }
+
+      function showToast(message) {
+        ui.toast.textContent = message;
+        ui.toast.classList.add('show');
+        clearTimeout(state.toastTimer);
+        state.toastTimer = setTimeout(() => ui.toast.classList.remove('show'), 2200);
+      }
+
+      ui.preset.addEventListener('change', () => loadPreset(ui.preset.value));
+      ui.toggle.addEventListener('click', toggleRunning);
+      ui.reset.addEventListener('click', resetSimulation);
+      ui.random.addEventListener('click', randomSystem);
+      ui.applyConditions.addEventListener('click', applyInitialConditions);
+      ui.timeScale.addEventListener('change', () => updateTimeScale());
+      ui.view3d.addEventListener('change', () => set3DView(ui.view3d.checked));
+      ui.trails.addEventListener('change', () => {
+        if (!ui.trails.checked) {
+          state.playbackTrails = visibleBodies().map(() => []);
+          state.renderBodies.forEach((b, index) => { b.trail = state.playbackTrails[index]; });
+        }
+      });
+
+      canvas.addEventListener('pointerdown', (event) => {
+        canvas.setPointerCapture(event.pointerId);
+        const orbiting = state.view3D && !event.shiftKey;
+        state.drag = orbiting
+          ? {
+              mode: 'orbit', x: event.clientX, y: event.clientY,
+              yaw: state.camera.yaw, pitch: state.camera.pitch
+            }
+          : {
+              mode: 'pan', x: event.clientX, y: event.clientY,
+              cameraX: state.camera.x, cameraY: state.camera.y
+            };
+        canvas.classList.add('dragging');
+        if (!orbiting) ui.tracking.checked = false;
+      });
+
+      canvas.addEventListener('pointermove', (event) => {
+        if (!state.drag) return;
+        if (state.drag.mode === 'orbit') {
+          state.camera.yaw = state.drag.yaw + (event.clientX - state.drag.x) * .006;
+          state.camera.pitch = Math.max(-1.36, Math.min(1.36,
+            state.drag.pitch + (event.clientY - state.drag.y) * .006
+          ));
+          return;
+        }
+        state.camera.x = state.drag.cameraX - (event.clientX - state.drag.x) / state.camera.scale;
+        state.camera.y = state.drag.cameraY + (event.clientY - state.drag.y) / state.camera.scale;
+        state.camera.targetX = state.camera.x;
+        state.camera.targetY = state.camera.y;
+      });
+
+      const endDrag = () => { state.drag = null; canvas.classList.remove('dragging'); };
+      canvas.addEventListener('pointerup', endDrag);
+      canvas.addEventListener('pointercancel', endDrag);
+
+      canvas.addEventListener('wheel', (event) => {
+        event.preventDefault();
+        if (state.view3D) {
+          const factor = Math.exp(-event.deltaY * .0012);
+          state.camera.scale = Math.max(1e-12, Math.min(1e12, state.camera.scale * factor));
+          return;
+        }
+        const before = screenToWorld(event.clientX, event.clientY);
+        const factor = Math.exp(-event.deltaY * .0012);
+        state.camera.scale = Math.max(1e-12, Math.min(1e12, state.camera.scale * factor));
+        const after = screenToWorld(event.clientX, event.clientY);
+        state.camera.x += before.x - after.x;
+        state.camera.y += before.y - after.y;
+        state.camera.targetX = state.camera.x;
+        state.camera.targetY = state.camera.y;
+        ui.tracking.checked = false;
+      }, { passive: false });
+
+      window.addEventListener('keydown', (event) => {
+        if (event.key.toLowerCase() === 'v') {
+          event.preventDefault();
+          set3DView(!state.view3D);
+          return;
+        }
+        if (event.target.matches('select, input, button')) return;
+        if (event.code === 'Space') { event.preventDefault(); toggleRunning(); }
+        if (event.key.toLowerCase() === 'r') resetSimulation();
+      });
+      window.addEventListener('resize', resize);
+
+      resize();
+      updateTimeScale(false);
+      set3DView(false, false);
+      loadPreset('figure8', false);
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>
