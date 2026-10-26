@@ -63,6 +63,15 @@ a{color:inherit}
 .section-head{display:flex;align-items:baseline;gap:18px;margin-bottom:28px}
 .section-head h2{margin:0;font-family:var(--serif);font-size:clamp(34px,4.5vw,54px);font-weight:400;letter-spacing:-.045em;line-height:1}
 .blank{height:140px;border:1px dashed var(--line);border-radius:6px}
+.game-list{display:grid;border-top:1px solid var(--line)}
+.game-entry{display:flex;align-items:center;gap:18px;padding:20px 4px;border-bottom:1px solid var(--line);text-decoration:none;transition:background .15s}
+.game-index{width:28px;flex:none;color:var(--muted);font-family:var(--mono);font-size:10px}
+.game-info{display:grid;gap:5px;min-width:0}
+.game-info strong{font-family:var(--serif);font-size:clamp(21px,2.5vw,29px);font-weight:400;letter-spacing:-.025em;line-height:1.15}
+.game-meta{color:var(--muted);font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+.game-arrow{margin-left:auto;color:var(--muted);font-size:18px;transition:color .15s,transform .15s}
+.game-entry:hover,.game-entry:focus-visible{background:var(--soft)}
+.game-entry:hover .game-arrow,.game-entry:focus-visible .game-arrow{color:var(--accent);transform:translate(2px,-2px)}
 
 .thanks{padding-block:88px 96px;border-top:1px solid var(--line)}
 .thanks h2{max-width:820px;margin:0;font-family:var(--serif);font-size:clamp(38px,5.4vw,62px);font-weight:400;letter-spacing:-.045em;line-height:1.18}
@@ -133,8 +142,16 @@ a{color:inherit}
         <div class="section-head">
           <h2 id="games-title"><span class="lang-zh">免费在线游戏</span><span class="lang-ja">無料オンラインゲーム</span><span class="lang-en">Free Online Games</span></h2>
         </div>
-        <!-- Add game links here when ready. -->
-        <div class="blank" aria-hidden="true"></div>
+        <div class="game-list">
+          <a class="game-entry" href="games/three-body/" aria-label="网页模拟：三体运动 / Web Simulation: Three-Body Motion">
+            <span class="game-index">01</span>
+            <span class="game-info">
+              <strong><span class="lang-zh">网页模拟：三体运动</span><span class="lang-ja">Webシミュレーション：三体運動</span><span class="lang-en">Web Simulation: Three-Body Motion</span></strong>
+              <span class="game-meta"><span class="lang-zh">打开即玩</span><span class="lang-ja">すぐにプレイ</span><span class="lang-en">Play in browser</span></span>
+            </span>
+            <span class="game-arrow" aria-hidden="true">↗</span>
+          </a>
+        </div>
       </section>
     </div>
 
