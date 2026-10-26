@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#fafaf7">
+<meta name="theme-color" content="#fafaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131312" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Samnour Games 山落游戏 — 免费在线游戏导航。">
 <title>Samnour Games · 山落游戏</title>
 <style>
 :root{
+  color-scheme:light;
   --bg:#fafaf7;
   --ink:#171715;
   --muted:#6f6f67;
@@ -18,6 +20,16 @@
   --sans:"Avenir Next","Segoe UI","Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
   --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
 }
+/* ── 深色主题（默认） ── */
+:root:has(#theme-dark:checked){
+  color-scheme:dark;
+  --bg:#131312;
+  --ink:#e9e8e1;
+  --muted:#8f8f85;
+  --line:#2e2e2a;
+  --soft:#1c1c1a;
+  --accent:#d4674a;
+}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;color:var(--ink);background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:antialiased}
@@ -26,7 +38,9 @@ a{color:inherit}
 .skip{position:fixed;top:12px;left:12px;z-index:10;padding:8px 14px;color:var(--bg);background:var(--ink);border-radius:4px;transform:translateY(-160%)}
 .skip:focus{transform:none}
 
-.lang-input{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+body,.site-header,.section,.thanks,.site-footer,.blank,.lang-switch,.theme-switch{transition:background-color .25s ease,border-color .25s ease,color .25s ease}
+
+.switch-input{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 .lang-ja,.lang-en{display:none}
 #lang-ja:checked~.page .lang-zh,#lang-ja:checked~.page .lang-en{display:none}
 #lang-ja:checked~.page .lang-ja{display:revert}
@@ -37,19 +51,24 @@ a{color:inherit}
 .brand{display:flex;align-items:baseline;gap:9px;text-decoration:none}
 .brand strong{font-family:var(--serif);font-size:20px;font-weight:500;letter-spacing:-.02em}
 .brand span{color:var(--muted);font-size:12px;letter-spacing:.08em}
-.header-tools{display:flex;align-items:center;gap:28px}
+.header-tools{display:flex;align-items:center;gap:20px}
 .site-nav{display:flex;gap:22px}
 .site-nav a{color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-decoration:none;text-transform:uppercase}
 .site-nav a:hover,.site-nav a:focus-visible{color:var(--ink)}
-.lang-switch{display:flex;gap:2px;padding:2px;border:1px solid var(--line);border-radius:999px}
-.lang-switch label{padding:5px 9px;color:var(--muted);border-radius:999px;font-family:var(--mono);font-size:9px;line-height:1;cursor:pointer;transition:color .15s,background .15s}
-.lang-switch label:hover{color:var(--ink)}
+
+.lang-switch,.theme-switch{display:flex;gap:2px;padding:2px;border:1px solid var(--line);border-radius:999px}
+.lang-switch label,.theme-switch label{padding:5px 9px;color:var(--muted);border-radius:999px;font-family:var(--mono);font-size:9px;line-height:1;cursor:pointer;transition:color .15s,background .15s}
+.lang-switch label:hover,.theme-switch label:hover{color:var(--ink)}
 #lang-zh:checked~.page .lang-switch label[for="lang-zh"],
 #lang-ja:checked~.page .lang-switch label[for="lang-ja"],
-#lang-en:checked~.page .lang-switch label[for="lang-en"]{color:var(--bg);background:var(--ink)}
+#lang-en:checked~.page .lang-switch label[for="lang-en"],
+#theme-light:checked~.page .theme-switch label[for="theme-light"],
+#theme-dark:checked~.page .theme-switch label[for="theme-dark"]{color:var(--bg);background:var(--ink)}
 #lang-zh:focus-visible~.page .lang-switch label[for="lang-zh"],
 #lang-ja:focus-visible~.page .lang-switch label[for="lang-ja"],
-#lang-en:focus-visible~.page .lang-switch label[for="lang-en"]{outline:1px solid var(--ink);outline-offset:2px}
+#lang-en:focus-visible~.page .lang-switch label[for="lang-en"],
+#theme-light:focus-visible~.page .theme-switch label[for="theme-light"],
+#theme-dark:focus-visible~.page .theme-switch label[for="theme-dark"]{outline:1px solid var(--ink);outline-offset:2px}
 
 .hero{padding-block:110px 96px}
 .kicker{margin:0 0 22px;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
@@ -85,10 +104,10 @@ a{color:inherit}
   .site-header{flex-wrap:wrap;gap:14px;padding-block:20px}
   .brand strong{font-size:18px}
   .brand span{display:none}
-  .header-tools{width:100%;justify-content:space-between;gap:16px}
-  .site-nav{gap:16px}
+  .header-tools{width:100%;flex-wrap:wrap;justify-content:space-between;gap:14px}
+  .site-nav{width:100%;gap:16px}
   .site-nav a{font-size:8px}
-  .lang-switch label{padding:5px 8px}
+  .lang-switch label,.theme-switch label{padding:5px 8px}
   .hero{padding-block:70px 64px}
   .hero h1{font-size:clamp(40px,13vw,64px)}
   .hero-copy{font-size:15px}
@@ -104,9 +123,11 @@ a{color:inherit}
 </style>
 </head>
 <body>
-<input class="lang-input" type="radio" name="lang" id="lang-zh" checked>
-<input class="lang-input" type="radio" name="lang" id="lang-ja">
-<input class="lang-input" type="radio" name="lang" id="lang-en">
+<input class="switch-input" type="radio" name="lang" id="lang-zh" checked>
+<input class="switch-input" type="radio" name="lang" id="lang-ja">
+<input class="switch-input" type="radio" name="lang" id="lang-en">
+<input class="switch-input" type="radio" name="theme" id="theme-light">
+<input class="switch-input" type="radio" name="theme" id="theme-dark" checked>
 
 <div class="page">
   <a class="skip" href="#main"><span class="lang-zh">跳到正文</span><span class="lang-ja" lang="ja">本文へ</span><span class="lang-en">Skip to content</span></a>
@@ -123,6 +144,10 @@ a{color:inherit}
           <label for="lang-zh">中文</label>
           <label for="lang-ja">日本語</label>
           <label for="lang-en">EN</label>
+        </div>
+        <div class="theme-switch" role="group" aria-label="Theme / 主题">
+          <label for="theme-light"><span class="lang-zh">浅色</span><span class="lang-ja" lang="ja">ライト</span><span class="lang-en">Light</span></label>
+          <label for="theme-dark"><span class="lang-zh">深色</span><span class="lang-ja" lang="ja">ダーク</span><span class="lang-en">Dark</span></label>
         </div>
       </div>
     </header>
