@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07090d">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="零依赖浏览器系统化劫案：在零点封锁前，从档案馆、铸造庭与玻璃园带走任意两件明日遗物，再抵达南码头。">
+  <title>零点前，偷走明天</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css?v=20261028-3">
+</head>
+<body>
+  <main id="shell">
+    <canvas id="game" aria-label="零点前，偷走明天游戏画面"></canvas>
+    <div id="grain" aria-hidden="true"></div>
+    <div id="rewind-wash" aria-hidden="true"></div>
+
+    <header id="topbar">
+      <div class="brand">
+        <div class="eyebrow">THE MIDNIGHT THEFT / LOCAL CAUSALITY ONLY</div>
+        <h1>零点前，偷走明天</h1>
+      </div>
+      <div id="mission-strip">
+        <span>主目标</span>
+        <b id="mission-copy" data-i18n-skip>取得任意 2 件明日遗物</b>
+        <em id="loot-count" data-i18n-skip>0 / 2</em>
+      </div>
+      <div id="clock-box">
+        <span id="phase-name" data-i18n-skip>自由潜入</span>
+        <b id="clock">05:00</b>
+        <small>撤离艇将在零点后短暂停留</small>
+      </div>
+    </header>
+
+    <aside id="objectives" class="panel">
+      <div class="panel-kicker">任选顺序 · 任选手段</div>
+      <h2>今晚的猎物</h2>
+      <div id="objective-list" data-i18n-skip></div>
+      <div id="escape-card" class="locked">
+        <i></i>
+        <div><span>最终目标</span><b>南码头撤离艇</b><small id="escape-note" data-i18n-skip>还需要 2 件遗物</small></div>
+      </div>
+      <div id="bonus-card">
+        <span>本局附加委托</span><b id="bonus-title" data-i18n-skip>保持无人死亡</b><small id="bonus-note" data-i18n-skip>附加条件不会阻止撤离</small>
+      </div>
+    </aside>
+
+    <aside id="target-panel" class="panel hidden">
+      <div class="panel-kicker">准星中的独立历史</div>
+      <div class="target-head"><h2 id="target-name" data-i18n-skip>—</h2><span id="target-kind" data-i18n-skip>—</span></div>
+      <div class="history-row"><span>可回溯记录</span><b id="history-time">0.0 秒</b></div>
+      <div class="history-bar"><i id="history-fill"></i></div>
+      <p id="target-state" data-i18n-skip>—</p>
+      <div class="target-rule"><kbd>右键按住</kbd><span>只撤销它；警报与旁人的行动继续</span></div>
+    </aside>
+
+    <section id="alert-panel">
+      <div><span>全城警戒</span><b id="alert-label" data-i18n-skip>无人知晓</b></div>
+      <div id="alert-pips"><i></i><i></i><i></i><i></i><i></i></div>
+    </section>
+
+    <section id="event-banner" class="hidden">
+      <span id="event-code" data-i18n-skip>CITY EVENT</span>
+      <b id="event-title" data-i18n-skip>事件标题</b>
+      <p id="event-copy" data-i18n-skip>事件说明</p>
+    </section>
+
+    <section id="feed" data-i18n-skip aria-live="polite"></section>
+
+    <section id="bottom-hud">
+      <div id="vitals">
+        <span>生命</span><i><b id="health-fill"></b></i><em id="health-value" data-i18n-skip>100</em>
+      </div>
+      <div id="tools">
+        <button class="tool active" data-tool="rivet" type="button"><kbd>1</kbd><i class="rivet"></i><span><b>铆钉枪</b><small>破坏 · 推动 · 引爆</small></span></button>
+        <button class="tool" data-tool="inductor" type="button"><kbd>2</kbd><i class="inductor"></i><span><b>感应针</b><small>击晕 · 干扰电子设备</small></span></button>
+      </div>
+      <div id="inventory">
+        <div><span>钥匙</span><b id="key-count" data-i18n-skip>0</b></div>
+        <div><span>破解器</span><b id="chip-count" data-i18n-skip>2</b></div>
+        <div><span>档案</span><b id="archive-file" data-i18n-skip>未取得</b></div>
+        <div><span>身份</span><b id="disguise-name" data-i18n-skip>无</b></div>
+        <div><span>携带</span><b id="carry-name" data-i18n-skip>空</b></div>
+      </div>
+      <div id="context-hint" data-i18n-skip></div>
+    </section>
+
+    <div id="crosshair" aria-hidden="true"><i></i></div>
+
+    <section id="start-screen" class="modal-layer">
+      <article class="start-card">
+        <div class="stamp">A SYSTEMIC HEIST — NO REQUIRED SOLUTION</div>
+        <div class="lang-picker" role="group" aria-label="Language">
+          <button type="button" data-lang="zh">中文</button>
+          <button type="button" data-lang="ja" lang="ja">日本語</button>
+          <button type="button" data-lang="en" lang="en">EN</button>
+        </div>
+        <h2>零点之前，<br>偷走至少两个明天。</h2>
+        <p>档案馆、铸造庭和玻璃园各保存一件明日遗物。闯进房间只是空间问题；真正带走遗物需要保管人在可信条件下签发授权。你可以偷凭证、借用制服、等待日程、制造停机或沉睡，再让签字者忘记——而城市账本继续记得。守卫不会因为看见你就立刻敌对；连续三次攻击或监控确认时才转入敌对，连续六次攻击则会直接推高全城警戒。</p>
+        <div class="brief-grid">
+          <div><span>明确目标</span><b>任取 2 / 3 件遗物，再去南码头撤离</b></div>
+          <div><span>敌意条件</span><b>3 次攻击触发附近敌意；6 次攻击提升全城警戒</b></div>
+          <div><span>持续后果</span><b>警报、火灾、已偷钥匙和目击不会连带消失</b></div>
+          <div><span>城市警戒</span><b>爆炸、死亡与连续 6 次攻击升级；30 秒无恶性事件降一级</b></div>
+        </div>
+        <div class="controls">
+          <div><kbd>W A S D</kbd><span>移动</span></div>
+          <div><kbd>Shift</kbd><span>蹲行</span></div>
+          <div><kbd>Space</kbd><span>冲刺</span></div>
+          <div><kbd>左键</kbd><span>使用工具</span></div>
+          <div><kbd>右键</kbd><span>单体回溯</span></div>
+          <div><kbd>E</kbd><span>互动 / 偷钥匙</span></div>
+          <div><kbd>F</kbd><span>搬起 / 抛出</span></div>
+          <div><kbd>1 / 2</kbd><span>切换工具</span></div>
+        </div>
+        <button id="start-button" type="button">开始劫案 <span>→</span></button>
+        <small>城区不会等待你观察。第一次也不必追求完美；抵达记录会说明你究竟制造了怎样的明天。</small>
+      </article>
+    </section>
+
+    <section id="result-screen" class="modal-layer hidden">
+      <article class="result-card">
+        <div class="stamp">MIDNIGHT LEDGER / 零点账本</div>
+        <h2 id="result-title" data-i18n-skip>你带着明天离开了。</h2>
+        <p id="result-story" data-i18n-skip></p>
+        <div id="result-grid" data-i18n-skip></div>
+        <div class="result-actions">
+          <button id="restart-button" type="button">再偷一次</button>
+          <button id="continue-button" type="button">留在城里实验</button>
+        </div>
+      </article>
+    </section>
+
+    <section id="pause-screen" class="modal-layer hidden">
+      <article class="pause-card"><span>PAUSED</span><h2>城区暂时安静。</h2><p>按 Esc 返回劫案。</p></article>
+    </section>
+  </main>
+  <script src="i18n-data.js?v=20261028-1"></script>
+  <script src="i18n.js?v=20261028-1"></script>
+  <script src="game.js?v=20261028-7"></script>
+</body>
+</html>
